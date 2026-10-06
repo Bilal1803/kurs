@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="description" content="Закрытая платформа обучения «Бизнес на нейросетях»">
+<meta name="theme-color" content="#0F100D">
+<title>Бизнес на нейросетях · обучение</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230F100D'/%3E%3Cpath d='M16 6l2.3 6.7L25 15l-6.7 2.3L16 24l-2.3-6.7L7 15l6.7-2.3z' fill='%23C5F23A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<script>
+  // тема до отрисовки, чтобы не было вспышки
+  (function(){ var t; try { t = localStorage.getItem("theme"); } catch(e){}
+    if(!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t; })();
+</script>
+<style>
+:root{
+  --bg:#F5F5F1; --surface:#FFFFFF; --surface-2:#F9F9F6; --line:#E7E6E0; --line-strong:#D3D2CA;
+  --text:#151612; --muted:#676862; --faint:#9A9B94;
+  --ink:#0F100D; --ink-2:#171814; --ink-3:#1F201B; --ink-line:#272822; --ink-text:#EDEEE8; --ink-muted:#8E8F88;
+  --accent:#C5F23A; --accent-hover:#B4E224; --on-accent:#0F100D; --accent-soft:#EEF8CC; --accent-text:#4A6100; --bullet:#86AE0B;
+  --note-bg:#FFF7DB; --note-line:#F0D36A; --note-text:#5A4300;
+  --danger:#D92D20;
+  --r-sm:10px; --r:14px; --r-lg:20px; --r-xl:28px;
+  --shadow:0 1px 2px rgba(15,16,13,.04),0 10px 30px -12px rgba(15,16,13,.12);
+  --shadow-lg:0 2px 4px rgba(15,16,13,.04),0 24px 60px -20px rgba(15,16,13,.25);
+  --font:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --side-w:316px;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0E0F0C; --surface:#161713; --surface-2:#1B1C18; --line:#272823; --line-strong:#353630;
+  --text:#ECEDE7; --muted:#A2A39B; --faint:#6F706A;
+  --ink-2:#121310; --ink-3:#1A1B17;
+  --accent-soft:#222A0C; --accent-text:#D2F46A; --bullet:#C5F23A;
+  --note-bg:#262110; --note-line:#5C4C14; --note-text:#F0DE9C;
+  --danger:#FF7B6E;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -12px rgba(0,0,0,.5);
+  --shadow-lg:0 24px 60px -20px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font:400 16px/1.6 var(--font);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+svg{flex-shrink:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.hidden{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- кнопки и чипы ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:12px;border:1px solid transparent;font-weight:600;font-size:15.5px;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s,transform .15s,box-shadow .15s}
+.btn:active{transform:translateY(1px)}
+.btn-accent{background:var(--accent);color:var(--on-accent)}
+.btn-accent:hover{background:var(--accent-hover)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:#25261F}
+[data-theme="dark"] .btn-dark{background:var(--accent);color:var(--on-accent)}
+.btn-ghost{background:transparent;border-color:var(--line-strong);color:var(--text)}
+.btn-ghost:hover{border-color:var(--text)}
+.btn-lg{min-height:54px;padding:0 26px;font-size:16px;border-radius:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.chip svg{width:13px;height:13px}
+.chip-accent{background:var(--accent-soft);color:var(--accent-text);border-color:transparent}
+.chip-dark{background:var(--ink);color:var(--ink-text);border-color:transparent}
+[data-theme="dark"] .chip-dark{background:var(--ink-3);border-color:var(--line)}
+
+/* ---------- загрузка ---------- */
+.boot{position:fixed;inset:0;display:grid;place-items:center;background:var(--ink);z-index:100}
+.boot-inner{display:flex;flex-direction:column;align-items:center;gap:18px;color:var(--ink-muted);font-size:14px}
+.spinner{width:28px;height:28px;border-radius:50%;border:2.5px solid #2B2C26;border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- логотип ---------- */
+.logo{display:inline-flex;align-items:center;gap:11px;text-decoration:none;color:inherit;font-weight:700;font-size:15.5px;letter-spacing:-.01em}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.logo small{display:block;font-size:12px;font-weight:500;color:var(--ink-muted);letter-spacing:0;margin-top:1px}
+
+/* ---------- вход ---------- */
+.gate{min-height:100vh;min-height:100dvh;background:var(--ink);color:var(--ink-text);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.gate::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(600px 400px at 85% 10%,rgba(197,242,58,.16),transparent 70%),
+  radial-gradient(500px 360px at 0% 100%,rgba(197,242,58,.07),transparent 70%);pointer-events:none}
+.gate::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000 30%,transparent 80%);pointer-events:none}
+.gate-top,.gate-main,.gate-foot{position:relative;z-index:1;width:100%;max-width:1180px;margin:0 auto;padding-left:32px;padding-right:32px}
+.gate-top{display:flex;align-items:center;justify-content:space-between;padding-top:28px}
+.gate-top a.help{color:var(--ink-muted);font-size:14px;text-decoration:none}
+.gate-top a.help:hover{color:var(--ink-text)}
+.gate-main{flex:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:72px;align-items:center;padding-top:48px;padding-bottom:48px}
+.badge-live{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px 0 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);font-size:13px;font-weight:500;color:#CFD0C9}
+.badge-live i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(197,242,58,.18)}
+.gate h1{font-size:clamp(40px,5.6vw,68px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:24px 0 20px}
+.gate h1 em{font-style:normal;color:var(--accent)}
+.gate-lead{font-size:18.5px;line-height:1.6;color:#B5B6AF;max-width:520px;margin:0 0 40px}
+.features{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:560px}
+.features li{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:var(--r);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.features .fi{width:34px;height:34px;border-radius:9px;background:rgba(197,242,58,.12);color:var(--accent);display:grid;place-items:center}
+.features b{display:block;font-size:14.5px;font-weight:600;color:var(--ink-text);line-height:1.35}
+.features span{font-size:13px;color:var(--ink-muted);line-height:1.45}
+.login-card{background:#fff;color:#151612;border-radius:var(--r-xl);padding:40px;box-shadow:0 40px 80px -30px rgba(0,0,0,.6)}
+[data-theme="dark"] .login-card{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+.login-card h2{font-size:26px;letter-spacing:-.025em;margin:0 0 8px;font-weight:700}
+.login-card > p{margin:0 0 28px;color:#676862;font-size:15px}
+[data-theme="dark"] .login-card > p{color:var(--muted)}
+.field-label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:14px;margin-bottom:8px}
+.field-label span{font-weight:400;color:var(--faint);font-size:13px}
+.key-wrap{position:relative}
+.key-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#9A9B94;pointer-events:none}
+.key-input{width:100%;height:58px;border-radius:14px;border:1.5px solid #E2E1DA;background:#F7F7F3;color:#151612;font:600 18px/1 var(--mono);letter-spacing:.04em;padding:0 16px 0 48px;text-transform:uppercase;transition:border-color .15s,box-shadow .15s,background .15s}
+[data-theme="dark"] .key-input{background:var(--bg);border-color:var(--line-strong);color:var(--text)}
+.key-input::placeholder{color:#B8B9B2;letter-spacing:.04em}
+.key-input:focus{outline:none;border-color:#151612;background:#fff;box-shadow:0 0 0 4px rgba(197,242,58,.45)}
+[data-theme="dark"] .key-input:focus{border-color:var(--accent);background:var(--bg);box-shadow:0 0 0 4px rgba(197,242,58,.15)}
+.key-input[aria-invalid="true"]{border-color:var(--danger)}
+.login-card .btn{width:100%;margin-top:14px}
+.btn .spinner{width:18px;height:18px;border-width:2px;border-color:rgba(15,16,13,.25);border-top-color:var(--on-accent)}
+.gate-error{display:flex;gap:8px;align-items:flex-start;margin-top:14px;color:var(--danger);font-size:14px;line-height:1.45}
+.gate-error:empty{display:none}
+.login-help{margin-top:28px;padding-top:24px;border-top:1px solid #ECEBE5;font-size:14px;color:#676862;line-height:1.55}
+[data-theme="dark"] .login-help{border-color:var(--line);color:var(--muted)}
+.login-help a{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--accent);text-decoration-thickness:2px}
+.gate-foot{display:flex;justify-content:space-between;gap:16px;padding-bottom:28px;font-size:13px;color:#6E6F68}
+@media (max-width:960px){
+  .gate-main{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:32px}
+  .gate-intro{display:contents}
+  .badge-live{align-self:flex-start}
+  .gate-lead{margin-bottom:28px}
+  .login-card{order:1;margin-bottom:28px}
+  .features{order:2;max-width:none}
+}
+@media (max-width:560px){
+  .gate-top,.gate-main,.gate-foot{padding-left:18px;padding-right:18px}
+  .features{grid-template-columns:1fr}
+  .login-card{padding:28px 22px;border-radius:22px}
+  .gate-foot{flex-direction:column;gap:4px}
+}
+
+/* ---------- приложение ---------- */
+.app{display:flex;min-height:100vh}
+.side{width:var(--side-w);flex-shrink:0;background:var(--ink);color:var(--ink-text);position:sticky;top:0;height:100vh;height:100dvh;display:flex;flex-direction:column;border-right:1px solid transparent}
+[data-theme="dark"] .side{background:var(--ink-2);border-right-color:var(--line)}
+.side-top{padding:22px 20px 18px}
+.side-scroll{flex:1;overflow-y:auto;padding:4px 12px 20px;scrollbar-width:thin;scrollbar-color:#2C2D27 transparent}
+.side-foot{padding:14px 16px;border-top:1px solid var(--ink-line);display:flex;gap:8px}
+.me{display:flex;align-items:center;gap:12px;margin-top:22px;padding:12px;border-radius:var(--r);background:rgba(255,255,255,.04);border:1px solid var(--ink-line)}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#D8F86A,#9BCB12);color:#0F100D;display:grid;place-items:center;font-weight:700;font-size:15px}
+.me-name{font-weight:600;font-size:14.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me-tariff{font-size:12.5px;color:var(--ink-muted)}
+.me > div{min-width:0}
+.prog{margin-top:16px;padding:0 2px}
+.prog-row{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-muted);margin-bottom:8px}
+.prog-row b{color:var(--ink-text);font-weight:600}
+.bar{height:6px;border-radius:6px;background:#262722;overflow:hidden}
+.bar > span{display:block;height:100%;width:0;border-radius:6px;background:var(--accent);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.side-label{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6E6F68;padding:14px 10px 8px}
+.lvl + .lvl{margin-top:2px}
+.lvl-head{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;color:var(--ink-text);text-align:left;padding:9px 10px;border-radius:12px}
+.lvl-head:hover{background:rgba(255,255,255,.04)}
+.lvl-badge{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:700;font-size:14px;background:#22231E;color:var(--ink-text)}
+.lvl.is-active .lvl-badge{background:var(--accent);color:var(--on-accent)}
+.lvl.is-done .lvl-badge{background:rgba(197,242,58,.14);color:var(--accent)}
+.lvl.is-muted .lvl-badge{color:#6E6F68}
+.lvl-info{flex:1;min-width:0}
+.lvl-name{display:block;font-size:14.5px;font-weight:600;line-height:1.3}
+.lvl.is-muted .lvl-name{color:#A4A59E}
+.lvl-meta{display:flex;align-items:center;gap:5px;font-size:12px;color:#7A7B74;margin-top:1px}
+.lvl-meta svg{width:12px;height:12px}
+.chev{color:#5F605A;transition:transform .2s}
+.lvl.is-open .chev{transform:rotate(90deg)}
+.lessons{list-style:none;margin:2px 0 8px;padding:0 0 0 25px;display:none;position:relative}
+.lvl.is-open .lessons{display:block}
+.lessons::before{content:"";position:absolute;left:24px;top:6px;bottom:6px;width:1px;background:var(--ink-line)}
+.les{display:flex;align-items:flex-start;gap:10px;padding:8px 10px 8px 0;border-radius:10px;text-decoration:none;font-size:13.5px;line-height:1.4;color:#A4A59E;position:relative}
+a.les:hover{color:var(--ink-text);background:rgba(255,255,255,.04)}
+.les-ico{width:20px;height:20px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:var(--ink);border:1.5px solid #3A3B35;margin-top:-1px;position:relative;z-index:1}
+[data-theme="dark"] .les-ico{background:var(--ink-2)}
+.les-ico svg{width:11px;height:11px}
+.les.done .les-ico{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.les.current{color:#fff;background:rgba(197,242,58,.09)}
+.les.current .les-ico{border-color:var(--accent);box-shadow:0 0 0 3px rgba(197,242,58,.18)}
+.les.current:not(.done) .les-ico::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.les.locked .les-ico,.les.soon .les-ico{border-color:transparent;background:transparent;color:#5F605A}
+.les.soon{color:#61625C;cursor:default}
+.les-num{color:#6E6F68;font-variant-numeric:tabular-nums;margin-right:4px}
+.les.current .les-num{color:var(--accent)}
+.les small{display:block;font-size:11.5px;color:#6E6F68;margin-top:1px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--ink-line);background:none;color:#B5B6AF;font-size:13.5px;font-weight:500}
+.icon-btn:hover{color:#fff;border-color:#3A3B35;background:rgba(255,255,255,.03)}
+.side-foot .icon-btn:last-child{flex:1}
+
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:15;height:64px;display:flex;align-items:center;gap:14px;padding:0 32px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line)}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-width:0;overflow:hidden;white-space:nowrap}
+.crumbs a{text-decoration:none}
+.crumbs a:hover{color:var(--text)}
+.crumbs .sep{color:var(--line-strong)}
+.crumbs .cur{color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.menu-btn{display:none;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-size:14px;font-weight:600}
+.top-prog{display:none;font-size:13px;color:var(--muted);font-weight:500}
+.read-bar{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--accent);transition:width .1s linear}
+.view{width:100%;max-width:880px;margin:0 auto;padding:44px 40px 96px;outline:none;animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.scrim{position:fixed;inset:0;background:rgba(10,11,8,.55);z-index:25;backdrop-filter:blur(2px);animation:fadein .2s}
+@keyframes fadein{from{opacity:0}}
+@media (max-width:1000px){
+  .side{position:fixed;inset:0 auto 0 0;z-index:30;width:min(var(--side-w),88vw);transform:translateX(-102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);box-shadow:var(--shadow-lg)}
+  .side.open{transform:none}
+  .menu-btn{display:inline-flex}
+  .top-prog{display:block}
+  .crumbs{display:none}
+  .topbar{padding:0 18px}
+  .view{padding:28px 20px 80px}
+}
+
+/* ---------- главная ---------- */
+.hero{position:relative;overflow:hidden;background:var(--ink);color:var(--ink-text);border-radius:var(--r-xl);padding:40px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:center}
+[data-theme="dark"] .hero{background:var(--surface);border:1px solid var(--line)}
+.hero::before{content:"";position:absolute;right:-120px;top:-160px;width:460px;height:460px;border-radius:50%;background:radial-gradient(closest-side,rgba(197,242,58,.22),transparent);pointer-events:none}
+.hero > *{position:relative}
+.hero .chip{background:rgba(197,242,58,.12);color:var(--accent);border-color:transparent}
+.hero h1{font-size:clamp(32px,4.4vw,46px);line-height:1.08;letter-spacing:-.035em;font-weight:800;margin:18px 0 12px}
+.hero p{margin:0 0 28px;color:#B5B6AF;font-size:16.5px;max-width:480px}
+[data-theme="dark"] .hero p{color:var(--muted)}
+.hero-next{margin-top:14px;font-size:13.5px;color:var(--ink-muted)}
+.hero-next b{color:var(--ink-text);font-weight:600}
+.ring{position:relative;width:164px;height:164px}
+.ring svg{transform:rotate(-90deg)}
+.ring-track{stroke:#262722}
+[data-theme="dark"] .ring-track{stroke:var(--line)}
+.ring-val{stroke:var(--accent);transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
+.ring-txt{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring-txt b{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.ring-txt span{font-size:12.5px;color:var(--ink-muted);margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px}
+.stat b{display:block;font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:13.5px;color:var(--muted)}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:52px 0 18px}
+.sec-head h2{font-size:24px;letter-spacing:-.025em;margin:0;font-weight:700}
+.sec-head p{margin:4px 0 0;color:var(--muted);font-size:14.5px}
+.levels{display:grid;gap:12px}
+.lcard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center;padding:20px 22px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line);text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .2s,transform .2s}
+a.lcard:hover{border-color:var(--line-strong);box-shadow:var(--shadow);transform:translateY(-1px)}
+.lcard-num{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:21px;font-weight:800;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.lcard.is-open .lcard-num{background:var(--ink);color:var(--accent);border-color:var(--ink)}
+[data-theme="dark"] .lcard.is-open .lcard-num{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.lcard.is-done .lcard-num{background:var(--accent-soft);color:var(--accent-text);border-color:transparent}
+.lcard-top{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.lcard h3{margin:0;font-size:17.5px;letter-spacing:-.015em;font-weight:700}
+.lcard p{margin:3px 0 0;color:var(--muted);font-size:14.5px;line-height:1.5}
+.lcard-foot{display:flex;align-items:center;gap:12px;margin-top:12px;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.mini{flex:1;max-width:220px;height:5px;border-radius:5px;background:var(--line);overflow:hidden}
+.mini span{display:block;height:100%;background:var(--accent);border-radius:5px}
+.lcard-go{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);transition:all .15s}
+a.lcard:hover .lcard-go{background:var(--ink);color:#fff;border-color:var(--ink)}
+[data-theme="dark"] a.lcard:hover .lcard-go{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.lcard.is-muted{background:transparent}
+.lcard.is-muted h3{color:var(--muted)}
+.upsell{margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 28px;border-radius:var(--r-lg);background:var(--accent);color:var(--on-accent)}
+.upsell h3{margin:0 0 4px;font-size:19px;letter-spacing:-.02em}
+.upsell p{margin:0;font-size:14.5px;opacity:.78;max-width:520px}
+.upsell .btn{background:var(--ink);color:#fff}
+.upsell .btn:hover{background:#25261F}
+@media (max-width:700px){
+  .hero{grid-template-columns:1fr;padding:28px 24px;border-radius:22px}
+  .ring{width:120px;height:120px;order:-1}
+  .ring-txt b{font-size:28px}
+  .hero .btn{width:100%}
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .stat{padding:14px}
+  .stat b{font-size:20px}
+  .stat span{font-size:12px}
+  .lcard{grid-template-columns:auto minmax(0,1fr);gap:14px;padding:16px}
+  .lcard-num{width:42px;height:42px;font-size:17px;border-radius:12px}
+  .lcard-go{display:none}
+  .upsell{flex-direction:column;align-items:flex-start;padding:22px}
+}
+
+/* ---------- урок ---------- */
+.l-head{margin-bottom:40px;padding-bottom:32px;border-bottom:1px solid var(--line)}
+.l-kicker{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.l-num{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:8px;background:var(--ink);color:var(--accent);font:700 14px/1 var(--mono);letter-spacing:.02em}
+[data-theme="dark"] .l-num{background:var(--accent);color:var(--on-accent)}
+.l-head h1{font-size:clamp(32px,4.6vw,50px);line-height:1.08;letter-spacing:-.035em;font-weight:800;margin:18px 0 20px;text-wrap:balance}
+.l-meta{display:flex;flex-wrap:wrap;gap:8px}
+.prose{font-size:17.5px;line-height:1.75;color:var(--text)}
+.prose > p{margin:0 0 20px}
+.prose > p:first-child{font-size:20px;line-height:1.6;color:var(--text);letter-spacing:-.005em}
+.prose h2{font-size:25px;line-height:1.3;letter-spacing:-.025em;font-weight:700;margin:52px 0 16px}
+.prose b,.prose strong{font-weight:650}
+.prose ul:not(.prices),.prose ol{list-style:none;margin:0 0 22px;padding:0}
+.prose ul:not(.prices) > li{position:relative;padding-left:28px;margin:0 0 10px}
+.prose ul:not(.prices) > li::before{content:"";position:absolute;left:8px;top:.72em;width:7px;height:7px;border-radius:50%;background:var(--bullet)}
+.prose ol{counter-reset:o}
+.prose ol > li{position:relative;padding-left:42px;margin:0 0 12px;counter-increment:o;min-height:28px}
+.prose ol > li::before{content:counter(o);position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);font-size:13px;font-weight:700;line-height:1;color:var(--text)}
+.prose .prompt{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);margin:0 0 20px;overflow:hidden;box-shadow:0 1px 2px rgba(15,16,13,.03)}
+.prose .prompt-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px 10px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.prose .prompt-label{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.prose .prompt-label::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.prose .copy{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600;color:var(--text);transition:border-color .15s}
+.prose .copy:hover{border-color:var(--text)}
+.prose .copy::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:var(--i-copy) center/contain no-repeat;mask:var(--i-copy) center/contain no-repeat}
+.prose .prompt-text{margin:0;padding:18px 20px;font-size:16.5px;line-height:1.65;font-weight:500}
+:root{--i-copy:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='12' height='12' rx='2'/%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E");
+  --i-bulb:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z'/%3E%3C/svg%3E");
+  --i-target:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3Ccircle cx='12' cy='12' r='2'/%3E%3C/svg%3E");
+  --i-list:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11l3 3L22 4'/%3E%3Cpath d='M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11'/%3E%3C/svg%3E")}
+.prose .note{position:relative;background:var(--note-bg);color:var(--note-text);border:1px solid var(--note-line);border-radius:var(--r);padding:16px 20px 16px 52px;margin:0 0 22px;font-size:16px;line-height:1.6}
+.prose .note::before{content:"";position:absolute;left:18px;top:18px;width:20px;height:20px;background:currentColor;-webkit-mask:var(--i-bulb) center/contain no-repeat;mask:var(--i-bulb) center/contain no-repeat}
+.prose .note p:last-child{margin-bottom:0}
+.prose .summary{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 28px;margin:44px 0 0;box-shadow:inset 4px 0 0 var(--accent)}
+.prose .summary h2,.prose .task h2{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:20px}
+.prose .summary h2::before,.prose .task h2::before{content:"";width:22px;height:22px;background:currentColor;-webkit-mask:var(--i-list) center/contain no-repeat;mask:var(--i-list) center/contain no-repeat}
+.prose .summary > :last-child{margin-bottom:0}
+.prose .task{background:var(--ink);color:#E6E7E1;border-radius:var(--r-lg);padding:28px 30px;margin:44px 0 0;position:relative;overflow:hidden}
+[data-theme="dark"] .prose .task{background:var(--surface);border:1px solid var(--line)}
+.prose .task::after{content:"";position:absolute;right:-60px;bottom:-80px;width:220px;height:220px;border-radius:50%;background:radial-gradient(closest-side,rgba(197,242,58,.16),transparent);pointer-events:none}
+.prose .task h2{color:var(--accent)}
+.prose .task h2::before{-webkit-mask-image:var(--i-target);mask-image:var(--i-target)}
+.prose .task p{margin:0;font-size:16.5px;position:relative}
+.prose .task p + p{margin-top:12px}
+.prose .prices{list-style:none;padding:0;margin:0 0 20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.prose .prices li{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 20px;margin:0;font-size:16px}
+.prose .prices li + li{border-top:1px solid var(--line)}
+.prose .prices b{font-weight:700;font-size:16.5px;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.prose .total{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--accent);color:var(--on-accent);border-radius:var(--r-lg);padding:18px 22px;margin:-8px 0 22px;font-weight:600}
+.prose .total b{font-size:28px;font-weight:800;letter-spacing:-.03em;white-space:nowrap}
+.prose .intro{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;margin:0 0 28px;font-size:16px;line-height:1.6;color:var(--muted)}
+.prose .intro b{color:var(--text)}
+.prose a{color:inherit;text-decoration:underline;text-decoration-color:var(--bullet);text-decoration-thickness:2px;text-underline-offset:3px}
+.prose a:hover{text-decoration-color:var(--text)}
+.prose li > ul,.prose li > ol{margin:10px 0 0}
+.prose .shot:not(.ok){display:none}
+.prose .shot{margin:8px 0 24px;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--surface)}
+.prose .shot img{display:block;width:100%;height:auto}
+.prose .shot figcaption{padding:10px 16px;font-size:13.5px;color:var(--muted);border-top:1px solid var(--line)}
+.prose .tbl{overflow-x:auto;margin:0 0 22px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+.prose .tbl table{width:100%;border-collapse:collapse;font-size:15.5px}
+.prose .tbl th,.prose .tbl td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.prose .tbl th{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:var(--surface-2)}
+.prose .tbl tr:last-child td{border-bottom:0}
+.prose .tbl td:last-child{white-space:nowrap;font-weight:700}
+.prose .material{display:flex;align-items:center;gap:16px;margin:36px 0 0;padding:18px 20px;border-radius:var(--r-lg);background:var(--accent-soft);border:1px solid transparent}
+[data-theme="dark"] .prose .material{border-color:#34401A}
+.prose .material-ico{width:44px;height:44px;flex-shrink:0;border-radius:12px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.prose .material-ico::before{content:"";width:20px;height:20px;background:currentColor;-webkit-mask:var(--i-dl) center/contain no-repeat;mask:var(--i-dl) center/contain no-repeat}
+.prose .material-info{flex:1;min-width:0}
+.prose .material-info b{display:block;font-size:16px;line-height:1.35}
+.prose .material-info span{display:block;font-size:14px;line-height:1.5;color:var(--muted);margin-top:2px}
+.prose .dl{flex-shrink:0;height:42px;padding:0 18px;border-radius:10px;border:0;background:var(--ink);color:#fff;font-size:14.5px;font-weight:600}
+.prose .dl:hover{background:#25261F}
+[data-theme="dark"] .prose .dl{background:var(--accent);color:var(--on-accent)}
+.prose .dl:disabled{opacity:.6;cursor:wait}
+.prose .material + .task{margin-top:14px}
+:root{--i-dl:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E")}
+@media (max-width:600px){
+  .prose .material{flex-wrap:wrap}
+  .prose .dl{width:100%}
+}
+.l-done{margin-top:56px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 26px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line)}
+.l-done h3{margin:0 0 2px;font-size:17px;letter-spacing:-.015em}
+.l-done p{margin:0;color:var(--muted);font-size:14.5px}
+.done-btn[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-text);border-color:transparent}
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.pager a{display:flex;flex-direction:column;gap:4px;padding:18px 20px;border-radius:var(--r-lg);border:1px solid var(--line);text-decoration:none;transition:border-color .15s,box-shadow .2s}
+.pager a:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
+.pager small{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.pager span{font-weight:600;font-size:15.5px;line-height:1.4;letter-spacing:-.01em}
+.pager .next{text-align:right;align-items:flex-end;grid-column:2}
+.pager .next.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.pager .next.primary small{color:var(--accent)}
+[data-theme="dark"] .pager .next.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+[data-theme="dark"] .pager .next.primary small{color:var(--on-accent);opacity:.7}
+@media (max-width:600px){
+  .prose{font-size:17px}
+  .prose > p:first-child{font-size:18.5px}
+  .prose h2{font-size:22px;margin-top:40px}
+  .prose .task,.prose .summary{padding:22px}
+  .prose .prices li{padding:12px 16px;font-size:15px}
+  .prose .total b{font-size:23px}
+  .l-done{flex-direction:column;align-items:stretch}
+  .pager{grid-template-columns:1fr}
+  .pager .next{grid-column:auto;order:-1}
+}
+
+/* ---------- закрытый урок ---------- */
+.locked{max-width:620px;margin:24px auto 0;text-align:center}
+.locked-ico{width:72px;height:72px;border-radius:22px;margin:0 auto 24px;display:grid;place-items:center;background:var(--ink);color:var(--accent);box-shadow:0 20px 40px -18px rgba(15,16,13,.5)}
+[data-theme="dark"] .locked-ico{background:var(--surface);border:1px solid var(--line)}
+.locked h1{font-size:clamp(28px,4vw,38px);line-height:1.12;letter-spacing:-.03em;margin:14px 0 14px;font-weight:800;text-wrap:balance}
+.locked > p{color:var(--muted);font-size:16.5px;margin:0 auto 28px;max-width:500px}
+.locked-list{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;margin:0 0 28px}
+.locked-list h4{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.locked-list ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.locked-list li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.45}
+.locked-list li svg{color:var(--bullet);margin-top:3px}
+.locked-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+
+/* ---------- окно повышения тарифа ---------- */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(10,11,8,.6);backdrop-filter:blur(3px);animation:fadein .2s}
+.modal-box{position:relative;width:100%;max-width:520px;max-height:calc(100dvh - 40px);overflow-y:auto;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:var(--r-xl);padding:32px;box-shadow:var(--shadow-lg);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.modal-x{position:absolute;right:16px;top:16px;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center}
+.modal-x:hover{color:var(--text);border-color:var(--line-strong)}
+.modal-box h2{font-size:26px;letter-spacing:-.03em;margin:14px 0 8px;font-weight:800}
+.modal-lead{margin:0 0 22px;color:var(--muted);font-size:15px}
+.up-list{display:grid;gap:10px}
+.up-opt{position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;border:1.5px solid var(--line);cursor:pointer;transition:border-color .15s,background .15s}
+.up-opt:hover{border-color:var(--line-strong)}
+.up-opt input{position:absolute;opacity:0;pointer-events:none}
+.up-radio{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line-strong);display:grid;place-items:center;flex-shrink:0}
+.up-opt:has(input:checked){border-color:var(--text);background:var(--surface-2)}
+.up-opt:has(input:checked) .up-radio{border-color:var(--text);background:var(--text)}
+.up-opt:has(input:checked) .up-radio::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--surface)}
+.up-opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.up-info{flex:1;min-width:0}
+.up-info b{display:block;font-size:16px}
+.up-info span{display:block;font-size:13.5px;color:var(--muted);line-height:1.45}
+.up-price{text-align:right;white-space:nowrap}
+.up-price b{display:block;font-size:17px;letter-spacing:-.01em}
+.up-price span{font-size:12.5px;color:var(--faint)}
+.up-total{display:flex;justify-content:space-between;align-items:center;margin:20px 0 16px;padding:16px 20px;border-radius:16px;background:var(--accent);color:var(--on-accent);font-weight:600}
+.up-total b{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.up-pay{width:100%}
+.up-note{margin:14px 0 0;font-size:13px;line-height:1.55;color:var(--muted);text-align:center}
+@media (max-width:560px){.modal{padding:0;place-items:end stretch}.modal-box{border-radius:22px 22px 0 0;padding:26px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:92dvh}}
+
+/* ---------- уведомление ---------- */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:12px 18px 12px 14px;border-radius:12px;font-size:14.5px;font-weight:500;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60}
+[data-theme="dark"] .toast{background:#24251F;border:1px solid var(--line-strong)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast i{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+</style>
+<script src="config.js?v=2"></script>
+</head>
+<body>
+
+<div class="boot" id="boot"><div class="boot-inner"><div class="spinner"></div>Загружаем обучение…</div></div>
+
+<section class="gate hidden" id="gate">
+  <header class="gate-top">
+    <div class="logo"><span class="logo-mark" data-icon="spark"></span><span>Бизнес на нейросетях<small>платформа обучения</small></span></div>
+    <a class="help contact-link" href="#" target="_blank" rel="noopener">Поддержка</a>
+  </header>
+  <div class="gate-main">
+    <div class="gate-intro">
+      <span class="badge-live"><i></i>Закрытый доступ для учеников</span>
+      <h1>Зарабатывай <em>на&nbsp;нейросетях</em> с нуля</h1>
+      <p class="gate-lead">Пошаговый путь от первого сообщения нейросети до своих сайтов, ботов и продуктов, за которые платят клиенты.</p>
+      <ul class="features">
+        <li><span class="fi" data-icon="layers"></span><div><b>Уровни по порядку</b><span>Каждый опирается на предыдущий</span></div></li>
+        <li><span class="fi" data-icon="terminal"></span><div><b>Готовые промпты</b><span>Копируешь и сразу применяешь</span></div></li>
+        <li><span class="fi" data-icon="target"></span><div><b>Практика в каждом уроке</b><span>Задание после теории</span></div></li>
+        <li><span class="fi" data-icon="wallet"></span><div><b>Фокус на заработке</b><span>Цены, клиенты, первые заказы</span></div></li>
+      </ul>
+    </div>
+    <div class="login-card">
+      <h2>Вход в обучение</h2>
+      <p>Введи ключ доступа, который пришёл тебе после оплаты.</p>
+      <form id="keyForm" novalidate>
+        <label class="field-label" for="keyInput">Ключ доступа <span>формат AI-XXXX-XXXX-XXXX</span></label>
+        <div class="key-wrap">
+          <span data-icon="key"></span>
+          <input class="key-input" id="keyInput" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AI-XXXX-XXXX-XXXX" maxlength="40" aria-describedby="gateError">
+        </div>
+        <button class="btn btn-accent btn-lg" id="keyBtn" type="submit">Открыть обучение</button>
+        <div class="gate-error" id="gateError" role="alert"></div>
+      </form>
+      <div class="login-help">Нет ключа или он не подходит? <a class="contact-link" href="#" target="_blank" rel="noopener">Напиши наставнику</a>, поможем в течение дня.</div>
+    </div>
+  </div>
+  <footer class="gate-foot"><span>© <span id="year"></span> Бизнес на нейросетях</span><span>Материалы курса доступны только ученикам</span></footer>
+</section>
+
+<div class="app hidden" id="app">
+  <aside class="side" id="side" aria-label="Программа курса">
+    <div class="side-top">
+      <a class="logo" href="#"><span class="logo-mark" data-icon="spark"></span><span>Бизнес на нейросетях<small>платформа обучения</small></span></a>
+      <div class="me"><span class="avatar" id="avatar"></span><div><div class="me-name" id="meName"></div><div class="me-tariff" id="meTariff"></div></div></div>
+      <div class="prog"><div class="prog-row"><span>Прогресс курса</span><b id="progText"></b></div><div class="bar"><span id="progBar"></span></div></div>
+    </div>
+    <div class="side-scroll">
+      <div class="side-label">Программа</div>
+      <nav id="nav"></nav>
+    </div>
+    <div class="side-foot">
+      <button class="icon-btn theme-btn" type="button" aria-label="Сменить тему"></button>
+      <button class="icon-btn" id="logoutBtn" type="button"><span data-icon="logout"></span>Выйти</button>
+    </div>
+  </aside>
+  <main>
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-controls="side" aria-expanded="false"><span data-icon="menu"></span>Уроки</button>
+      <nav class="crumbs" id="crumbs" aria-label="Навигация"></nav>
+      <div class="top-right"><span class="top-prog" id="topProg"></span></div>
+      <div class="read-bar" id="readBar"></div>
+    </div>
+    <div class="view" id="view" tabindex="-1"></div>
+  </main>
+</div>
+<div class="modal hidden" id="upModal" role="dialog" aria-modal="true" aria-labelledby="upTitle">
+  <div class="modal-box">
+    <button class="modal-x" type="button" data-close aria-label="Закрыть"></button>
+    <span class="chip chip-accent" id="upNow"></span>
+    <h2 id="upTitle">Повышение тарифа</h2>
+    <p class="modal-lead">Выбери тариф. Ты доплачиваешь только разницу, ключ остаётся тем же.</p>
+    <div class="up-list" id="upList" role="radiogroup" aria-label="Новый тариф"></div>
+    <div class="up-total"><span>К доплате</span><b id="upSum"></b></div>
+    <a class="btn btn-accent btn-lg up-pay" id="upPay" href="#" target="_blank" rel="noopener"></a>
+    <p class="up-note">Откроется чат с наставником в Telegram с готовым сообщением. Отправь его и оплати доплату по реквизитам наставника: уроки откроются сразу после подтверждения.</p>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const API = (window.CONFIG && CONFIG.API_URL || "").replace(/\/$/, "");
+const CONTACT = (window.CONFIG && CONFIG.CONTACT_URL) || "#";
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// ---------- иконки ----------
+const P = {
+  spark:'<path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" fill="currentColor" stroke="none"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
+  right:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+  left:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  chev:'<polyline points="9 6 15 12 9 18"/>',
+  menu:'<line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M18.5 4.5l2 2"/>',
+  layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  terminal:'<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  wallet:'<path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
+  book:'<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+  alert:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  ext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>'
+};
+const icon = (n, s = 16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+document.querySelectorAll("[data-icon]").forEach(el => el.innerHTML = icon(el.dataset.icon, el.classList.contains("logo-mark") ? 17 : 18));
+document.querySelectorAll(".contact-link").forEach(a => a.href = CONTACT);
+$("year").textContent = new Date().getFullYear();
+
+// ---------- тема ----------
+function paintTheme(){
+  const dark = document.documentElement.dataset.theme === "dark";
+  document.querySelectorAll(".theme-btn").forEach(b => { b.innerHTML = icon(dark ? "sun" : "moon", 17); b.title = dark ? "Светлая тема" : "Тёмная тема"; });
+}
+document.addEventListener("click", e => {
+  if(!e.target.closest(".theme-btn")) return;
+  const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = t; store.set("theme", t); paintTheme();
+});
+paintTheme();
+
+// ---------- данные ----------
+let ME = null, KEY = "", LEVELS = [], OPEN = [], ALL = [], done = {}, doneKey = "", expanded = new Set();
+const num = id => /^\d+-\d+$/.test(id) ? id.replace("-", ".") : "";
+const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? b : c); };
+const readMin = html => Math.max(2, Math.round(String(html).replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length / 170));
+
+async function login(key){
+  const res = await fetch(API + "/api/access", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key})});
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok){ const e = new Error(data.detail || "Не получилось войти. Попробуй ещё раз."); e.status = res.status; throw e; }
+  return data;
+}
+
+function start(data, key){
+  ME = data; KEY = key; LEVELS = data.course;
+  ALL = LEVELS.flatMap((l, li) => l.lessons.map(x => ({...x, lvl:l, li})));
+  OPEN = ALL.filter(x => x.allowed && x.ready);
+  doneKey = "done:" + key;
+  try { done = JSON.parse(store.get(doneKey) || "{}") || {}; } catch(e){ done = {}; }
+  const name = (data.name || "").trim();
+  $("avatar").textContent = (name ? name.split(/\s+/).map(w => w[0]).slice(0, 2).join("") : "У").toUpperCase();
+  $("meName").textContent = name || "Ученик";
+  $("meTariff").textContent = "Тариф «" + data.tariff_name + "»";
+  $("boot").classList.add("hidden"); $("gate").classList.add("hidden"); $("app").classList.remove("hidden");
+  route();
+}
+
+function showGate(){ $("boot").classList.add("hidden"); $("gate").classList.remove("hidden"); }
+
+// ---------- форма входа ----------
+const keyInput = $("keyInput");
+function normKey(v){
+  const raw = v.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const body = raw.startsWith("AI") ? raw.slice(2) : raw;
+  if(body.length !== 12) return v.toUpperCase().trim();
+  return "AI-" + body.match(/.{4}/g).join("-");
+}
+keyInput.addEventListener("paste", () => setTimeout(() => { keyInput.value = normKey(keyInput.value); }, 0));
+keyInput.addEventListener("blur", () => { if(keyInput.value) keyInput.value = normKey(keyInput.value); });
+keyInput.addEventListener("input", () => { keyInput.removeAttribute("aria-invalid"); $("gateError").textContent = ""; });
+
+$("keyForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const key = normKey(keyInput.value);
+  keyInput.value = key;
+  const err = msg => { $("gateError").innerHTML = icon("alert", 16) + "<span>" + esc(msg) + "</span>"; keyInput.setAttribute("aria-invalid", "true"); };
+  if(!key){ err("Вставь ключ, который пришёл после оплаты."); keyInput.focus(); return; }
+  const btn = $("keyBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Проверяем ключ…'; $("gateError").textContent = "";
+  try { const data = await login(key); store.set("courseKey", key); start(data, key); }
+  catch(ex){ err(ex.message === "Failed to fetch" ? "Нет связи с сервером. Проверь интернет и попробуй ещё раз." : ex.message); }
+  finally { btn.disabled = false; btn.innerHTML = "Открыть обучение" + icon("right", 18); }
+});
+$("keyBtn").innerHTML = "Открыть обучение" + icon("right", 18);
+
+$("logoutBtn").addEventListener("click", () => {
+  if(!confirm("Выйти из обучения? Чтобы войти снова, понадобится ключ.")) return;
+  store.del("courseKey"); location.hash = ""; location.reload();
+});
+
+// ---------- мобильное меню ----------
+const side = $("side"), view = $("view"), menuBtn = $("menuBtn");
+let scrim = null;
+function closeMenu(){ side.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); if(scrim){ scrim.remove(); scrim = null; } }
+menuBtn.addEventListener("click", () => {
+  if(side.classList.contains("open")) return closeMenu();
+  side.classList.add("open"); menuBtn.setAttribute("aria-expanded","true");
+  scrim = document.createElement("div"); scrim.className = "scrim"; scrim.addEventListener("click", closeMenu); document.body.appendChild(scrim);
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeMenu(); });
+
+// ---------- состояние уровня ----------
+function levelState(l){
+  const open = l.lessons.filter(x => x.allowed && x.ready);
+  const allowed = l.lessons.filter(x => x.allowed);
+  const locked = l.lessons.filter(x => !x.allowed);
+  const doneN = open.filter(x => done[x.id]).length;
+  let state;
+  if(!allowed.length) state = "locked";
+  else if(!open.length) state = "soon";
+  else if(doneN === open.length) state = "done";
+  else if(doneN) state = "progress";
+  else state = "open";
+  return {open, allowed, locked, doneN, state, lockTariff: locked[0] && locked[0].min_tariff};
+}
+
+// ---------- боковое меню ----------
+function renderNav(current){
+  const cur = ALL.find(x => x.id === current);
+  if(cur) expanded.add(cur.li);
+  if(!expanded.size){ const first = LEVELS.findIndex(l => levelState(l).state === "open" || levelState(l).state === "progress"); expanded.add(first < 0 ? 0 : first); }
+  $("nav").innerHTML = LEVELS.map((l, i) => {
+    const s = levelState(l);
+    const meta = s.state === "locked" ? `${icon("lock",12)}Тариф «${esc(s.lockTariff)}»`
+      : s.state === "soon" ? `${icon("clock",12)}Скоро · ${l.lessons.length} ${plural(l.lessons.length,"урок","урока","уроков")}`
+      : s.state === "done" ? `${icon("check",12)}Пройден`
+      : `${s.doneN} из ${s.open.length} ${plural(s.open.length,"урока","уроков","уроков")}`;
+    const cls = ["lvl", expanded.has(i) && "is-open", cur && cur.li === i && "is-active", s.state === "done" && "is-done", (s.state === "locked" || s.state === "soon") && "is-muted"].filter(Boolean).join(" ");
+    const items = l.lessons.map(x => {
+      const n = num(x.id) ? `<span class="les-num">${num(x.id)}</span>` : "";
+      if(x.allowed && x.ready){
+        const isDone = !!done[x.id], isCur = current === x.id;
+        return `<li><a class="les${isDone?" done":""}${isCur?" current":""}" href="#lesson-${esc(x.id)}" ${isCur?'aria-current="page"':""}><span class="les-ico">${isDone?icon("check",11):""}</span><span>${n}${esc(x.title)}</span></a></li>`;
+      }
+      if(!x.allowed) return `<li><a class="les locked" href="#locked-${esc(x.id)}"><span class="les-ico">${icon("lock",11)}</span><span>${n}${esc(x.title)}<small>Тариф «${esc(x.min_tariff)}»</small></span></a></li>`;
+      return `<li><span class="les soon" aria-disabled="true"><span class="les-ico">${icon("clock",11)}</span><span>${n}${esc(x.title)}<small>Скоро</small></span></span></li>`;
+    }).join("");
+    return `<div class="${cls}"><button class="lvl-head" type="button" data-lvl="${i}" aria-expanded="${expanded.has(i)}"><span class="lvl-badge">${esc(l.n)}</span><span class="lvl-info"><span class="lvl-name">${esc(l.name)}</span><span class="lvl-meta">${meta}</span></span><span class="chev">${icon("chev",16)}</span></button><ul class="lessons">${items}</ul></div>`;
+  }).join("");
+  const count = OPEN.filter(x => done[x.id]).length;
+  const pct = OPEN.length ? Math.round(count / OPEN.length * 100) : 0;
+  $("progText").textContent = OPEN.length ? `${pct}%` : "—";
+  $("progBar").style.width = pct + "%";
+  $("topProg").textContent = OPEN.length ? `Пройдено ${count} из ${OPEN.length}` : "";
+}
+$("nav").addEventListener("click", e => {
+  const h = e.target.closest("[data-lvl]");
+  if(h){ const i = +h.dataset.lvl; expanded.has(i) ? expanded.delete(i) : expanded.add(i); h.parentElement.classList.toggle("is-open"); h.setAttribute("aria-expanded", expanded.has(i)); return; }
+  if(e.target.closest("a")) closeMenu();
+});
+
+function crumbs(parts){
+  $("crumbs").innerHTML = parts.map((p, i) => i === parts.length - 1 ? `<span class="cur">${esc(p.t)}</span>` : `<a href="${p.h}">${esc(p.t)}</a><span class="sep">/</span>`).join("");
+}
+
+// ---------- главная ----------
+function renderHome(){
+  const count = OPEN.filter(x => done[x.id]).length;
+  const pct = OPEN.length ? Math.round(count / OPEN.length * 100) : 0;
+  const next = OPEN.find(x => !done[x.id]);
+  const first = (ME.name || "").trim().split(/\s+/)[0];
+  const title = count === 0 ? (first ? `Привет, ${esc(first)}!` : "Добро пожаловать!") : next ? (first ? `${esc(first)}, продолжим?` : "Продолжим?") : "Все уроки пройдены";
+  const lead = !OPEN.length ? "Первые уроки появятся совсем скоро. Мы напишем, когда они будут готовы."
+    : count === 0 ? "Проходи уровни по порядку: каждый следующий опирается на предыдущий. Начни с первого урока, это займёт несколько минут."
+    : next ? "Хороший темп. Продолжай с того места, где остановился." : "Ты прошёл все открытые уроки. Новые появятся здесь, как только будут готовы.";
+  const C = 2 * Math.PI * 70;
+  const lessonsTotal = ALL.length, levelsTotal = LEVELS.length;
+  const anyLocked = ALL.some(x => !x.allowed);
+  const lockedTariffs = [...new Set(ALL.filter(x => !x.allowed).map(x => x.min_tariff))];
+
+  view.innerHTML = `
+  <section class="hero">
+    <div>
+      <span class="chip">${icon("spark",12)}Тариф «${esc(ME.tariff_name)}»</span>
+      <h1>${title}</h1>
+      <p>${lead}</p>
+      ${next ? `<a class="btn btn-accent btn-lg" href="#lesson-${esc(next.id)}">${count ? "Продолжить обучение" : "Начать обучение"}${icon("right",18)}</a>
+      <div class="hero-next">Следующий урок: <b>${num(next.id) ? num(next.id) + " · " : ""}${esc(next.title)}</b></div>` : ""}
+    </div>
+    <div class="ring" role="img" aria-label="Пройдено ${pct}%">
+      <svg width="100%" height="100%" viewBox="0 0 164 164"><circle class="ring-track" cx="82" cy="82" r="70" fill="none" stroke-width="10"/><circle class="ring-val" cx="82" cy="82" r="70" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>
+      <div class="ring-txt"><b>${pct}%</b><span>пройдено</span></div>
+    </div>
+  </section>
+  <div class="stats">
+    <div class="stat"><b>${count}<span style="font-size:.6em;color:var(--faint)"> / ${OPEN.length}</span></b><span>уроков пройдено</span></div>
+    <div class="stat"><b>${OPEN.length}</b><span>${plural(OPEN.length,"урок открыт","урока открыто","уроков открыто")}</span></div>
+    <div class="stat"><b>${levelsTotal}</b><span>${plural(levelsTotal,"уровень","уровня","уровней")} в программе</span></div>
+  </div>
+
+  <div class="sec-head"><div><h2>Программа курса</h2><p>${levelsTotal} ${plural(levelsTotal,"уровень","уровня","уровней")} · ${lessonsTotal} ${plural(lessonsTotal,"урок","урока","уроков")} · от новичка до профи</p></div></div>
+  <div class="levels">${LEVELS.map(l => {
+    const s = levelState(l);
+    const target = s.open.length ? "#lesson-" + (s.open.find(x => !done[x.id]) || s.open[0]).id : s.state === "locked" ? "#locked-" + s.locked[0].id : "";
+    const chip = s.state === "locked" ? `<span class="chip chip-dark">${icon("lock")}Тариф «${esc(s.lockTariff)}»</span>`
+      : s.state === "soon" ? `<span class="chip">${icon("clock")}Скоро</span>`
+      : s.state === "done" ? `<span class="chip chip-accent">${icon("check")}Пройден</span>`
+      : s.state === "progress" ? `<span class="chip chip-accent">В процессе</span>`
+      : `<span class="chip chip-accent">Открыт</span>`;
+    const partLock = s.allowed.length && s.locked.length ? `<span class="chip">${icon("lock")}часть в тарифе «${esc(s.lockTariff)}»</span>` : "";
+    const foot = s.open.length
+      ? `<span>${s.doneN} / ${s.open.length}</span><div class="mini"><span style="width:${Math.round(s.doneN / s.open.length * 100)}%"></span></div>`
+      : `<span>${l.lessons.length} ${plural(l.lessons.length,"урок","урока","уроков")}</span>`;
+    const cls = `lcard${s.open.length ? " is-open" : ""}${s.state === "done" ? " is-done" : ""}${!s.open.length ? " is-muted" : ""}`;
+    const inner = `<span class="lcard-num">${esc(l.n)}</span><div><div class="lcard-top"><h3>${esc(l.name)}</h3>${chip}${partLock}</div><p>${esc(l.desc)}</p><div class="lcard-foot">${foot}</div></div>`;
+    return target ? `<a class="${cls}" href="${target}">${inner}<span class="lcard-go">${icon("right",16)}</span></a>` : `<div class="${cls}">${inner}<span></span></div>`;
+  }).join("")}</div>
+  ${anyLocked ? `<section class="upsell"><div><h3>Открой весь курс</h3><p>Часть уроков доступна на ${lockedTariffs.length > 1 ? "старших тарифах" : "тарифе «" + esc(lockedTariffs[0]) + "»"}. Ключ останется тем же, доступ обновится сразу после оплаты.</p></div><button class="btn btn-lg" type="button" data-upgrade="">Повысить тариф${icon("right",18)}</button></section>` : ""}`;
+  requestAnimationFrame(() => requestAnimationFrame(() => { const r = view.querySelector(".ring-val"); if(r) r.style.strokeDashoffset = C * (1 - pct / 100); }));
+  crumbs([{t:"Программа курса"}]);
+  document.title = "Бизнес на нейросетях · обучение";
+}
+
+// ---------- закрытый урок ----------
+function renderLocked(id){
+  const x = ALL.find(a => a.id === id);
+  const more = ALL.filter(a => !a.allowed && a.min_tariff === x.min_tariff && a.id !== id);
+  view.innerHTML = `
+  <div class="locked">
+    <div class="locked-ico">${icon("lock",30)}</div>
+    <span class="chip">${esc(x.lvl.name)}</span>
+    <h1>${esc(x.title)}</h1>
+    <p>Этот урок входит в тариф «${esc(x.min_tariff)}». Повысь тариф, чтобы открыть его: ключ останется тем же, а доступ обновится сразу.</p>
+    ${more.length ? `<div class="locked-list"><h4>Также откроется в тарифе «${esc(x.min_tariff)}»</h4><ul>${more.slice(0, 6).map(m => `<li>${icon("check",15)}<span>${esc(m.title)}</span></li>`).join("")}${more.length > 6 ? `<li style="color:var(--muted)">${icon("spark",15)}<span>и ещё ${more.length - 6} ${plural(more.length - 6,"урок","урока","уроков")}</span></li>` : ""}</ul></div>` : ""}
+    <div class="locked-actions"><button class="btn btn-dark btn-lg" type="button" data-upgrade="${esc(x.min_tariff)}">Повысить тариф${icon("right",18)}</button><a class="btn btn-ghost btn-lg" href="#">К программе</a></div>
+  </div>`;
+  crumbs([{t:"Программа курса", h:"#"}, {t:x.lvl.name, h:"#"}, {t:x.title}]);
+  document.title = x.title + " · Бизнес на нейросетях";
+}
+
+// ---------- урок ----------
+function renderLesson(id){
+  const i = OPEN.findIndex(x => x.id === id), x = OPEN[i], prev = OPEN[i-1], next = OPEN[i+1];
+  const inLvl = x.lvl.lessons.filter(a => a.allowed && a.ready), pos = inLvl.findIndex(a => a.id === id) + 1;
+  const lvlName = (/^\d+$/.test(x.lvl.n) ? "Уровень " + x.lvl.n + " · " : "") + x.lvl.name;
+  const isDone = !!done[id];
+  view.innerHTML = `
+  <article>
+    <header class="l-head">
+      <div class="l-kicker">${num(x.id) ? `<span class="l-num">Урок ${num(x.id)}</span>` : ""}<span>${esc(lvlName)}</span></div>
+      <h1>${esc(x.title)}</h1>
+      <div class="l-meta"><span class="chip">${icon("clock")}${readMin(x.body)} мин чтения</span><span class="chip">${icon("book")}${pos} из ${inLvl.length} в уровне</span><span class="chip chip-accent${isDone ? "" : " hidden"}" id="doneChip">${icon("check")}Пройден</span></div>
+    </header>
+    <div class="prose">${x.body}</div>
+    <section class="l-done">
+      <div><h3 id="doneTitle">${isDone ? "Урок пройден" : "Закончил урок?"}</h3><p id="doneText">${isDone ? "Отличная работа. Можно переходить к следующему." : "Отметь его, чтобы видеть свой прогресс в программе."}</p></div>
+      <button class="btn btn-dark done-btn" id="doneBtn" aria-pressed="${isDone}"></button>
+    </section>
+    <nav class="pager" aria-label="Соседние уроки">
+      ${prev ? `<a class="prev" href="#lesson-${esc(prev.id)}"><small>${icon("left",14)}Предыдущий урок</small><span>${num(prev.id) ? num(prev.id) + " · " : ""}${esc(prev.title)}</span></a>` : ""}
+      ${next ? `<a class="next${isDone ? " primary" : ""}" href="#lesson-${esc(next.id)}"><small>Следующий урок${icon("right",14)}</small><span>${num(next.id) ? num(next.id) + " · " : ""}${esc(next.title)}</span></a>`
+             : `<a class="next" href="#"><small>Готово${icon("right",14)}</small><span>Вернуться к программе</span></a>`}
+    </nav>
+  </article>`;
+  const btn = $("doneBtn");
+  const paint = () => {
+    const d = !!done[id];
+    btn.setAttribute("aria-pressed", String(d));
+    btn.innerHTML = d ? icon("check",18) + "Пройден" : "Отметить как пройденный";
+    $("doneChip").classList.toggle("hidden", !d);
+    $("doneTitle").textContent = d ? "Урок пройден" : "Закончил урок?";
+    $("doneText").textContent = d ? "Отличная работа. Можно переходить к следующему." : "Отметь его, чтобы видеть свой прогресс в программе.";
+    const n = view.querySelector(".pager .next"); if(n && next) n.classList.toggle("primary", d);
+  };
+  paint();
+  btn.addEventListener("click", () => {
+    if(done[id]) delete done[id]; else { done[id] = 1; toast(next ? "Урок пройден. Следующий ждёт ниже" : "Урок пройден"); }
+    store.set(doneKey, JSON.stringify(done));
+    paint(); renderNav(id);
+  });
+  crumbs([{t:"Программа курса", h:"#"}, {t:lvlName, h:"#"}, {t:(num(x.id) ? num(x.id) + " " : "") + x.title}]);
+  document.title = x.title + " · Бизнес на нейросетях";
+}
+
+// ---------- маршруты ----------
+function route(){
+  if(!ME) return;
+  const h = decodeURIComponent(location.hash);
+  let current = null;
+  const id = h.replace(/^#(lesson|locked)-/, "");
+  if(h.startsWith("#lesson-") && OPEN.some(x => x.id === id)){ current = id; renderLesson(id); }
+  else if(/^#(lesson|locked)-/.test(h) && ALL.some(x => x.id === id && !x.allowed)) renderLocked(id);
+  else renderHome();
+  renderNav(current); closeMenu();
+  view.style.animation = "none"; void view.offsetWidth; view.style.animation = "";
+  window.scrollTo({top:0, behavior:"instant"}); view.focus({preventScroll:true});
+  updateRead();
+}
+window.addEventListener("hashchange", route);
+
+// прогресс чтения урока
+function updateRead(){
+  const bar = $("readBar");
+  if(!view.querySelector(".prose")){ bar.style.width = "0"; return; }
+  const max = document.documentElement.scrollHeight - innerHeight;
+  bar.style.width = (max > 0 ? Math.min(100, scrollY / max * 100) : 100) + "%";
+}
+addEventListener("scroll", updateRead, {passive:true});
+
+// стрелки влево/вправо на странице урока
+document.addEventListener("keydown", e => {
+  if(e.target.closest("input,textarea,select") || e.altKey || e.ctrlKey || e.metaKey) return;
+  if(e.key === "ArrowRight"){ const a = view.querySelector(".pager .next"); if(a && a.getAttribute("href") !== "#") location.hash = a.getAttribute("href"); }
+  if(e.key === "ArrowLeft"){ const a = view.querySelector(".pager .prev"); if(a) location.hash = a.getAttribute("href"); }
+});
+
+// кнопки внутри уроков
+document.addEventListener("click", e => {
+  const go = e.target.closest("[data-go]");
+  if(go){ const t = go.dataset.go; location.hash = t === "home" ? "" : "lesson-" + t; if(t === "home") route(); return; }
+  const c = e.target.closest(".copy");
+  if(c){ copyText(c.dataset.copy || (c.closest(".prompt")?.querySelector(".prompt-text")?.innerText) || ""); return; }
+  const d = e.target.closest(".dl[data-material]");
+  if(d) download(d);
+});
+
+// скачивание материалов: сервер проверяет ключ и тариф
+async function download(btn){
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = "Загружаем…";
+  try {
+    const res = await fetch(API + "/api/material", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key: KEY, material: btn.dataset.material})});
+    if(!res.ok){ const data = await res.json().catch(() => ({})); throw new Error(data.detail || "Не удалось скачать файл"); }
+    const name = (/filename\*?=(?:UTF-8'')?"?([^";]+)/i.exec(res.headers.get("Content-Disposition") || "") || [])[1] || btn.dataset.material;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(await res.blob()); a.download = decodeURIComponent(name);
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast("Файл скачан");
+  } catch(err){ toast(err.message === "Failed to fetch" ? "Нет связи с сервером" : err.message); }
+  finally { btn.disabled = false; btn.textContent = label; }
+}
+
+// ---------- повышение тарифа ----------
+const TARIFF_LIST = (window.CONFIG && CONFIG.TARIFFS) || [];
+const rub = n => n.toLocaleString("ru-RU") + " ₽";
+const curTariff = () => TARIFF_LIST.find(t => t.id === ME.tariff || t.name === ME.tariff_name);
+function openUpgrade(wanted){
+  const cur = TARIFF_LIST.indexOf(curTariff());
+  const higher = TARIFF_LIST.slice(cur + 1);
+  if(!higher.length){ window.open(CONTACT, "_blank", "noopener"); return; }
+  const rank = name => TARIFF_LIST.findIndex(t => t.name === name);
+  const curPrice = cur >= 0 ? TARIFF_LIST[cur].price : 0;
+  $("upNow").innerHTML = icon("spark",12) + "Сейчас: тариф «" + esc(ME.tariff_name) + "»";
+  $("upList").innerHTML = higher.map(t => {
+    const r = rank(t.name);
+    const opens = ALL.filter(x => !x.allowed && rank(x.min_tariff) <= r).length;
+    return `<label class="up-opt"><input type="radio" name="upT" value="${t.id}"><span class="up-radio"></span>
+      <span class="up-info"><b>${esc(t.name)}</b><span>${esc(t.desc)}${opens ? ` · откроет ${opens} ${plural(opens,"урок","урока","уроков")}` : ""}</span></span>
+      <span class="up-price"><b>+${rub(t.price - curPrice)}</b><span>полная цена ${rub(t.price)}</span></span></label>`;
+  }).join("");
+  const pre = higher.find(t => t.name === wanted) || higher[0];
+  $("upList").querySelector(`input[value="${pre.id}"]`).checked = true;
+  paintUpgrade();
+  $("upModal").classList.remove("hidden"); document.body.style.overflow = "hidden";
+  setTimeout(() => $("upList").querySelector("input:checked").focus(), 50);
+}
+function paintUpgrade(){
+  const t = TARIFF_LIST.find(x => x.id === $("upList").querySelector("input:checked").value);
+  const cur = curTariff();
+  const diff = t.price - (cur ? cur.price : 0);
+  $("upSum").textContent = rub(diff);
+  $("upPay").innerHTML = "Оплатить через наставника" + icon("right",18);
+  const msg = `Здравствуйте! Хочу перейти с тарифа «${ME.tariff_name}» на тариф «${t.name}». Доплата ${rub(diff)}.` +
+    (ME.name ? `\nИмя: ${ME.name}` : "") + `\nМой ключ: ${KEY}\nПодскажите, как оплатить.`;
+  $("upPay").href = CONTACT.replace(/\/$/, "") + "?text=" + encodeURIComponent(msg);
+}
+function closeUpgrade(){ $("upModal").classList.add("hidden"); document.body.style.overflow = ""; }
+$("upList").addEventListener("change", paintUpgrade);
+$("upModal").addEventListener("click", e => { if(e.target === $("upModal") || e.target.closest("[data-close]")) closeUpgrade(); });
+$("upPay").addEventListener("click", () => { setTimeout(closeUpgrade, 300); toast("Открываем чат с наставником"); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("upModal").classList.contains("hidden")) closeUpgrade(); });
+document.addEventListener("click", e => { const u = e.target.closest("[data-upgrade]"); if(u && ME) openUpgrade(u.dataset.upgrade); });
+document.querySelector(".modal-x").innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
+
+let toastTimer;
+function toast(msg){ const t = $("toast"); t.innerHTML = `<i>${icon("check",13)}</i>${esc(msg)}`; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2000); }
+async function copyText(s){
+  try { await navigator.clipboard.writeText(s); toast("Промпт скопирован"); }
+  catch(e){ try { const ta = document.createElement("textarea"); ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); toast("Промпт скопирован"); } catch(err){ toast("Выдели текст и скопируй вручную"); } }
+}
+
+// ---------- автоматический вход, если ключ уже вводили ----------
+(async () => {
+  const saved = store.get("courseKey");
+  if(!saved){ showGate(); return; }
+  keyInput.value = saved;
+  try { start(await login(saved), saved); }
+  catch(e){
+    if(e.status === 403) store.del("courseKey");
+    showGate();
+    if(e.message === "Failed to fetch") $("gateError").innerHTML = icon("alert",16) + "<span>Нет связи с сервером. Проверь интернет и нажми «Открыть обучение».</span>";
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0F100D">
+<title>Панель управления · Бизнес на нейросетях</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230F100D'/%3E%3Cpath d='M16 6l2.3 6.7L25 15l-6.7 2.3L16 24l-2.3-6.7L7 15l6.7-2.3z' fill='%23C5F23A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<script>
+  (function(){ var t; try { t = localStorage.getItem("theme"); } catch(e){}
+    if(!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t; })();
+</script>
+<style>
+:root{
+  --bg:#F5F5F1; --surface:#FFFFFF; --surface-2:#F9F9F6; --line:#E7E6E0; --line-strong:#D3D2CA;
+  --text:#151612; --muted:#676862; --faint:#9A9B94;
+  --ink:#0F100D; --ink-text:#EDEEE8; --ink-muted:#8E8F88; --ink-line:#272822;
+  --accent:#C5F23A; --accent-hover:#B4E224; --on-accent:#0F100D; --accent-soft:#EEF8CC; --accent-text:#4A6100;
+  --danger:#D92D20; --danger-soft:#FDECEA; --warn-soft:#FFF4D6; --warn-text:#8A5A00; --info-soft:#EAF1FF; --info-text:#2457C5;
+  --r:12px; --r-lg:18px; --r-xl:24px;
+  --shadow:0 1px 2px rgba(15,16,13,.04),0 10px 30px -14px rgba(15,16,13,.14);
+  --font:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0E0F0C; --surface:#161713; --surface-2:#1B1C18; --line:#272823; --line-strong:#353630;
+  --text:#ECEDE7; --muted:#A2A39B; --faint:#6F706A;
+  --accent-soft:#222A0C; --accent-text:#D2F46A;
+  --danger:#FF7B6E; --danger-soft:#2E1614; --warn-soft:#2A220E; --warn-text:#F1CF7A; --info-soft:#141E33; --info-text:#8DB2FF;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+svg{flex-shrink:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.hidden{display:none!important}
+
+/* кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 16px;border-radius:10px;border:1px solid transparent;font-weight:600;font-size:14.5px;text-decoration:none;white-space:nowrap;background:none;transition:background .15s,border-color .15s,color .15s}
+.btn-accent{background:var(--accent);color:var(--on-accent)}
+.btn-accent:hover{background:var(--accent-hover)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:#25261F}
+[data-theme="dark"] .btn-dark{background:var(--accent);color:var(--on-accent)}
+.btn-line{border-color:var(--line-strong);background:var(--surface)}
+.btn-line:hover{border-color:var(--text)}
+.btn-sm{min-height:34px;padding:0 12px;font-size:13px;border-radius:9px}
+.btn-block{width:100%;min-height:50px;font-size:15.5px;border-radius:12px}
+.btn:disabled{opacity:.6;cursor:wait}
+.iconbtn{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.iconbtn:hover{color:var(--text);border-color:var(--line-strong)}
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(127,127,127,.3);border-top-color:currentColor;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* шапка */
+.top{position:sticky;top:0;z-index:20;background:var(--ink);color:var(--ink-text);border-bottom:1px solid var(--ink-line)}
+.top-in{max-width:1320px;margin:0 auto;height:64px;padding:0 28px;display:flex;align-items:center;gap:16px}
+.logo{display:inline-flex;align-items:center;gap:11px;font-weight:700;font-size:15px;letter-spacing:-.01em;text-decoration:none}
+.logo-mark{width:32px;height:32px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.logo .tag{font-size:11.5px;font-weight:600;color:var(--ink-muted);border:1px solid var(--ink-line);border-radius:6px;padding:2px 7px;margin-left:4px}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.top .tbtn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--ink-line);background:none;color:#B5B6AF;font-size:13.5px;font-weight:500;text-decoration:none}
+.top .tbtn:hover{color:#fff;border-color:#3A3B35}
+.top .tbtn.square{width:36px;padding:0;justify-content:center}
+
+/* вход */
+.login-page{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--ink);position:relative;overflow:hidden}
+.login-page::before{content:"";position:absolute;inset:0;background:radial-gradient(520px 380px at 50% 0%,rgba(197,242,58,.14),transparent 70%);pointer-events:none}
+.login{position:relative;width:100%;max-width:400px}
+.login .logo{color:var(--ink-text);margin-bottom:28px;justify-content:center;width:100%}
+.login-card{background:var(--surface);border-radius:var(--r-xl);padding:32px;box-shadow:0 40px 80px -30px rgba(0,0,0,.6)}
+[data-theme="dark"] .login-card{border:1px solid var(--line)}
+.login-card h1{font-size:22px;letter-spacing:-.02em;margin:0 0 6px}
+.login-card > p{margin:0 0 24px;color:var(--muted);font-size:14.5px}
+.login-note{text-align:center;color:#6E6F68;font-size:12.5px;margin-top:18px}
+
+/* поля */
+.field{margin-bottom:16px}
+.label{display:block;font-weight:600;font-size:13.5px;margin:0 0 7px}
+.label span{font-weight:400;color:var(--faint)}
+.input{width:100%;height:46px;border:1px solid var(--line-strong);border-radius:11px;background:var(--surface);padding:0 14px;transition:border-color .15s,box-shadow .15s}
+.input::placeholder{color:var(--faint)}
+.input:focus{outline:none;border-color:var(--text);box-shadow:0 0 0 4px rgba(197,242,58,.35)}
+[data-theme="dark"] .input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(197,242,58,.12)}
+.pass-wrap{position:relative}
+.pass-wrap .input{padding-right:48px}
+.pass-wrap button{position:absolute;right:6px;top:6px;width:34px;height:34px;border:0;background:none;color:var(--faint);border-radius:8px;display:grid;place-items:center}
+.pass-wrap button:hover{color:var(--text)}
+.err{display:flex;gap:8px;align-items:flex-start;color:var(--danger);font-size:13.5px;margin-top:12px}
+.err:empty{display:none}
+
+/* страница */
+.wrap{max-width:1320px;margin:0 auto;padding:32px 28px 80px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px}
+.page-head h1{font-size:30px;letter-spacing:-.03em;margin:0;font-weight:800;line-height:1.15}
+.page-head p{margin:4px 0 0;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;position:relative;overflow:hidden}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13.5px;font-weight:500}
+.kpi-ico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.kpi b{display:block;font-size:28px;font-weight:800;letter-spacing:-.035em;line-height:1.1;margin-top:10px;font-variant-numeric:tabular-nums}
+.kpi small{display:block;font-size:12.5px;color:var(--faint);margin-top:4px}
+.kpi.main{background:var(--ink);color:var(--ink-text);border-color:var(--ink)}
+[data-theme="dark"] .kpi.main{background:var(--surface-2);border-color:var(--line-strong)}
+.kpi.main .kpi-top{color:var(--ink-muted)}
+.kpi.main .kpi-ico{background:rgba(197,242,58,.14);border-color:transparent;color:var(--accent)}
+.kpi.main small{color:var(--ink-muted)}
+.split{display:flex;height:6px;border-radius:6px;overflow:hidden;margin-top:12px;background:#262722;gap:2px}
+.split span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:11.5px;color:var(--ink-muted)}
+.legend i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px;vertical-align:1px}
+.grid{display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 22px 0}
+.card-h h2{font-size:17px;letter-spacing:-.015em;margin:0}
+.card-h p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.card-b{padding:18px 22px 22px}
+.sticky{position:sticky;top:84px}
+.tariffs{display:grid;gap:8px;margin-bottom:18px}
+.tariff{position:relative;display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+.tariff:hover{border-color:var(--line-strong)}
+.tariff input{position:absolute;opacity:0;pointer-events:none}
+.radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line-strong);display:grid;place-items:center;flex-shrink:0}
+.tariff:has(input:checked){border-color:var(--text);background:var(--surface-2)}
+.tariff:has(input:checked) .radio{border-color:var(--text);background:var(--text)}
+.tariff:has(input:checked) .radio::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--surface)}
+.tariff:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.tariff-info{flex:1;min-width:0}
+.tariff-info b{display:block;font-weight:600;font-size:14.5px}
+.tariff-info span{color:var(--muted);font-size:12.5px}
+.price{font-weight:700;font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.result{margin-top:18px;border-radius:16px;background:var(--ink);color:var(--ink-text);padding:20px;animation:pop .3s ease}
+[data-theme="dark"] .result{background:var(--surface-2);border:1px solid var(--line-strong)}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}}
+.result-top{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-muted)}
+.result-top i{width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.key{font:700 22px/1.2 var(--mono);color:var(--accent);letter-spacing:.03em;margin:12px 0 4px;word-break:break-all}
+.result small{display:block;color:var(--ink-muted);font-size:12.5px;margin-bottom:16px}
+.result .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.result .btn{border-color:#34352F;color:var(--ink-text);min-height:40px;font-size:13.5px}
+.result .btn:hover{border-color:#6E6F68}
+.result .btn.btn-accent{color:var(--on-accent);border-color:transparent}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:18px 22px 14px}
+.search{position:relative;flex:1 1 240px}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--faint);pointer-events:none}
+.search .input{padding-left:38px;height:40px;background:var(--surface-2)}
+.seg{display:inline-flex;padding:3px;border-radius:11px;background:var(--surface-2);border:1px solid var(--line)}
+.seg button{border:0;background:none;height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(15,16,13,.08),0 0 0 1px var(--line)}
+.seg em{font-style:normal;color:var(--faint);font-weight:500;margin-left:4px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;padding:10px 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+th:first-child,td:first-child{padding-left:22px}
+th:last-child,td:last-child{padding-right:22px}
+td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+tr.off .who,tr.off .keycell,tr.off .tsel{opacity:.5}
+td.c-btns{width:1%}
+.who{display:flex;align-items:center;gap:12px;min-width:170px}
+.ava{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0;color:#0F100D}
+.who b{display:block;font-weight:600;font-size:14px;line-height:1.3}
+.who small{color:var(--muted);font-size:12.5px}
+.keycell{display:inline-flex;align-items:center;gap:6px}
+.keycell code{font:600 13px/1 var(--mono);letter-spacing:.02em;white-space:nowrap}
+.keycell .iconbtn{width:28px;height:28px;border-radius:7px;border-color:transparent;background:none}
+.keycell .iconbtn:hover{border-color:var(--line)}
+.tsel{height:32px;border:1px solid var(--line);border-radius:999px;padding:0 28px 0 12px;font-size:13px;font-weight:600;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center;appearance:none;-webkit-appearance:none;cursor:pointer}
+.tsel:hover{border-color:var(--line-strong)}
+.activity{display:flex;flex-direction:column;align-items:flex-start;gap:4px;white-space:nowrap}
+.activity small{color:var(--faint);font-size:12px}
+.badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-active{background:var(--accent-soft);color:var(--accent-text)}
+.b-wait{background:var(--warn-soft);color:var(--warn-text)}
+.b-off{background:var(--danger-soft);color:var(--danger)}
+.actions{display:flex;gap:6px;justify-content:flex-end}
+.empty{padding:56px 22px;text-align:center;color:var(--muted)}
+.empty-ico{width:52px;height:52px;margin:0 auto 14px;border-radius:14px;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--line);color:var(--faint)}
+.empty b{display:block;color:var(--text);font-size:15px;margin-bottom:4px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:12px 18px 12px 14px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 20px 50px -20px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60}
+[data-theme="dark"] .toast{background:#24251F;border:1px solid var(--line-strong)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast i{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.toast.bad i{background:var(--danger);color:#fff}
+
+@media (max-width:1100px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .sticky{position:static}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .top-in{padding:0 16px}
+  .top .tbtn .lbl,.logo .tag{display:none}
+  .wrap{padding:22px 14px 64px}
+  .page-head{flex-direction:column;align-items:flex-start}
+  .page-head h1{font-size:25px}
+  .kpis{gap:10px}
+  .kpi{padding:14px}
+  .kpi b{font-size:22px}
+  .toolbar{padding:16px}
+  .seg{width:100%;overflow-x:auto;scrollbar-width:none}
+  .seg::-webkit-scrollbar{display:none}
+  .seg button{flex:1}
+  /* таблица превращается в карточки */
+  table,thead,tbody,tr,td{display:block}
+  thead{display:none}
+  tbody tr{padding:14px 16px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:10px 12px;align-items:center}
+  tbody tr:hover{background:none}
+  td{padding:0!important;border:0}
+  table{table-layout:fixed}
+  td{min-width:0}
+  td.c-who{grid-area:1/1/2/2;min-width:0}
+  td.c-who .who{min-width:0}
+  td.c-btns{grid-area:1/2/2/3;width:auto}
+  td.c-tariff{grid-area:2/1/3/2}
+  td.c-act{grid-area:2/2/3/3;justify-self:end}
+  td.c-act .activity{align-items:flex-end}
+  td.c-key{grid-area:3/1/4/3}
+  td.c-key::before{content:attr(data-l);display:inline-block;width:64px;color:var(--faint);font-size:12.5px}
+  .seg button{padding:0 8px;font-size:12.5px}
+  .seg em{margin-left:3px}
+  .foot{padding:14px 16px}
+  .card-h{padding:18px 16px 0}
+  .card-b{padding:16px}
+}
+</style>
+<script src="config.js?v=2"></script>
+</head>
+<body>
+
+<section class="login-page hidden" id="loginBox">
+  <div class="login">
+    <div class="logo"><span class="logo-mark" data-icon="spark"></span>Бизнес на нейросетях<span class="tag">админ</span></div>
+    <div class="login-card">
+      <h1>Панель управления</h1>
+      <p>Продажи, ключи доступа и ученики.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label class="label" for="pass">Пароль администратора</label>
+          <div class="pass-wrap"><input class="input" type="password" id="pass" autocomplete="current-password" required><button type="button" id="peek" aria-label="Показать пароль" data-icon="eye"></button></div>
+        </div>
+        <button class="btn btn-dark btn-block" id="loginBtn" type="submit">Войти</button>
+        <div class="err" id="loginErr" role="alert"></div>
+      </form>
+    </div>
+    <div class="login-note">Доступ только для владельца курса</div>
+  </div>
+</section>
+
+<div id="panel" class="hidden">
+  <header class="top">
+    <div class="top-in">
+      <div class="logo"><span class="logo-mark" data-icon="spark"></span>Бизнес на нейросетях<span class="tag">админ</span></div>
+      <div class="top-actions">
+        <a class="tbtn" id="siteLink" href="./" target="_blank" rel="noopener"><span data-icon="ext"></span><span class="lbl">Открыть сайт</span></a>
+        <button class="tbtn square theme-btn" type="button" aria-label="Сменить тему"></button>
+        <button class="tbtn" id="logoutBtn" type="button"><span data-icon="logout"></span><span class="lbl">Выйти</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="page-head">
+      <div><h1>Продажи и ключи</h1><p>Создавай ключи для покупателей и управляй доступом к урокам.</p></div>
+      <button class="btn btn-line" id="refreshBtn" type="button"><span data-icon="refresh"></span>Обновить</button>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid">
+      <div class="card sticky">
+        <div class="card-h"><div><h2>Новая продажа</h2><p>Выбери тариф и создай ключ</p></div></div>
+        <div class="card-b">
+          <form id="saleForm">
+            <div class="tariffs" role="radiogroup" aria-label="Тариф">
+              <label class="tariff"><input type="radio" name="tariff" value="start" checked><span class="radio"></span><span class="tariff-info"><b>Старт</b><span>Обучение без поиска клиентов</span></span><span class="price">2 990 ₽</span></label>
+              <label class="tariff"><input type="radio" name="tariff" value="earn"><span class="radio"></span><span class="tariff-info"><b>Заработок</b><span>Обучение и поиск клиентов</span></span><span class="price">5 990 ₽</span></label>
+              <label class="tariff"><input type="radio" name="tariff" value="mentor"><span class="radio"></span><span class="tariff-info"><b>Наставник</b><span>Всё и личная поддержка</span></span><span class="price">11 990 ₽</span></label>
+            </div>
+            <div class="field"><label class="label" for="name">Имя покупателя <span>· необязательно</span></label><input class="input" type="text" id="name" autocomplete="off" placeholder="Например, Артём" maxlength="100"></div>
+            <div class="field"><label class="label" for="phone">Телефон или Telegram <span>· необязательно</span></label><input class="input" type="text" id="phone" autocomplete="off" placeholder="+7 900 000-00-00" maxlength="30"></div>
+            <button class="btn btn-dark btn-block" id="saleBtn" type="submit"><span data-icon="key"></span>Создать ключ</button>
+            <div class="err" id="saleErr" role="alert"></div>
+          </form>
+          <div class="result hidden" id="result" aria-live="polite">
+            <div class="result-top"><i data-icon="check"></i><span>Ключ создан · тариф «<span id="resTariff"></span>»</span></div>
+            <div class="key" id="resKey"></div>
+            <small>для <span id="resName"></span></small>
+            <div class="row">
+              <button class="btn" id="copyKey" type="button"><span data-icon="copy"></span>Ключ</button>
+              <button class="btn btn-accent" id="copyMsg" type="button"><span data-icon="send"></span>Сообщение</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><div><h2>Покупатели</h2><p id="listSub">Все выданные ключи</p></div><button class="btn btn-line btn-sm" id="csvBtn" type="button"><span data-icon="download"></span>CSV</button></div>
+        <div class="toolbar">
+          <div class="search"><span data-icon="search"></span><input class="input" type="search" id="search" placeholder="Поиск по имени, телефону или ключу" aria-label="Поиск"></div>
+          <div class="seg" id="seg" role="group" aria-label="Фильтр"></div>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Покупатель</th><th>Тариф</th><th>Ключ</th><th>Активность</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div class="foot" id="foot"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const API = (window.CONFIG && CONFIG.API_URL || "").replace(/\/$/, "");
+const SITE = (window.CONFIG && CONFIG.SITE_URL) || "";
+const TARIFFS = {start:"Старт", earn:"Заработок", mentor:"Наставник"};
+const PRICES = {start:2990, earn:5990, mentor:11990};
+const COLORS = {start:"#9FD0FF", earn:"#C5F23A", mentor:"#FFB86B"};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let PASS = "";
+try { PASS = sessionStorage.getItem("adminPass") || ""; } catch(e) {}
+let SALES = [], last = null, filter = "all";
+
+// ---------- иконки ----------
+const P = {
+  spark:'<path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" fill="currentColor" stroke="none"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M18.5 4.5l2 2"/>',
+  copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  ext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  refresh:'<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  wallet:'<path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>',
+  ban:'<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>',
+  power:'<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>',
+  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>',
+  alert:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>'
+};
+const icon = (n, s = 16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+document.querySelectorAll("[data-icon]").forEach(el => el.innerHTML = icon(el.dataset.icon, el.classList.contains("logo-mark") ? 16 : el.tagName === "I" ? 12 : 16));
+if(SITE) $("siteLink").href = SITE;
+
+// ---------- тема ----------
+function paintTheme(){
+  const dark = document.documentElement.dataset.theme === "dark";
+  document.querySelectorAll(".theme-btn").forEach(b => { b.innerHTML = icon(dark ? "sun" : "moon", 16); b.title = dark ? "Светлая тема" : "Тёмная тема"; });
+}
+document.addEventListener("click", e => {
+  if(!e.target.closest(".theme-btn")) return;
+  const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = t; try { localStorage.setItem("theme", t); } catch(err) {} paintTheme();
+});
+paintTheme();
+
+// ---------- запросы ----------
+async function api(path, opts = {}){
+  const res = await fetch(API + path, {...opts, headers:{"Content-Type":"application/json", "Authorization":"Bearer " + PASS, ...(opts.headers||{})}});
+  const data = await res.json().catch(() => ({}));
+  if(res.status === 401){ logout(); throw new Error("Неверный пароль"); }
+  if(!res.ok) throw new Error(data.detail || "Ошибка сервера");
+  return data;
+}
+const netMsg = e => e.message === "Failed to fetch" ? "Нет связи с сервером. Проверь API_URL в config.js и что сервер запущен." : e.message;
+const errHtml = m => icon("alert", 16) + "<span>" + esc(m) + "</span>";
+
+// ---------- вход ----------
+function showLogin(){ $("panel").classList.add("hidden"); $("loginBox").classList.remove("hidden"); setTimeout(() => $("pass").focus(), 50); }
+function logout(){ PASS = ""; try { sessionStorage.removeItem("adminPass"); } catch(e) {} showLogin(); }
+$("logoutBtn").addEventListener("click", logout);
+$("peek").addEventListener("click", () => {
+  const p = $("pass"), show = p.type === "password";
+  p.type = show ? "text" : "password"; $("peek").innerHTML = icon(show ? "eyeoff" : "eye", 16);
+  $("peek").setAttribute("aria-label", show ? "Скрыть пароль" : "Показать пароль");
+});
+
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault(); PASS = $("pass").value; $("loginErr").textContent = "";
+  const b = $("loginBtn"); b.disabled = true; b.innerHTML = '<span class="spinner"></span>Проверяем…';
+  try { await api("/api/admin/login", {method:"POST"}); try { sessionStorage.setItem("adminPass", PASS); } catch(e) {} $("pass").value = ""; openPanel(); }
+  catch(err){ $("loginErr").innerHTML = errHtml(netMsg(err)); }
+  finally { b.disabled = false; b.textContent = "Войти"; }
+});
+
+async function openPanel(){
+  $("loginBox").classList.add("hidden"); $("panel").classList.remove("hidden");
+  await loadSales();
+}
+async function loadSales(){
+  try { SALES = await api("/api/admin/sales"); render(); }
+  catch(err){ toast(netMsg(err), true); }
+}
+$("refreshBtn").addEventListener("click", async () => { await loadSales(); toast("Данные обновлены"); });
+
+// ---------- форматирование ----------
+const money = n => n.toLocaleString("ru-RU") + " ₽";
+const dateStr = ts => new Date(ts * 1000).toLocaleDateString("ru-RU", {day:"numeric", month:"short", year:"numeric"}).replace(" г.", "");
+const timeStr = ts => new Date(ts * 1000).toLocaleTimeString("ru-RU", {hour:"2-digit", minute:"2-digit"});
+function ago(ts){
+  const s = Date.now() / 1000 - ts;
+  if(s < 60) return "только что";
+  if(s < 3600) return Math.floor(s / 60) + " мин назад";
+  if(s < 86400) return Math.floor(s / 3600) + " ч назад";
+  if(s < 86400 * 2) return "вчера";
+  if(s < 86400 * 30) return Math.floor(s / 86400) + " дн назад";
+  return dateStr(ts);
+}
+const initials = n => (n || "").trim() ? n.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase() : "?";
+const AVA = ["#D8F86A","#9FD0FF","#FFB86B","#C9B8FF","#7EE0C3","#FF9FB2"];
+const avaColor = s => AVA[[...String(s)].reduce((a, c) => a + c.charCodeAt(0), 0) % AVA.length];
+const status = s => s.revoked ? "off" : s.last_seen ? "active" : "wait";
+const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? b : c); };
+
+// ---------- отрисовка ----------
+function render(){
+  const active = SALES.filter(s => !s.revoked);
+  const sum = active.reduce((a, s) => a + (PRICES[s.tariff] || 0), 0);
+  const entered = active.filter(s => s.last_seen).length;
+  const off = SALES.length - active.length;
+  const weekAgo = Date.now() / 1000 - 7 * 86400;
+  const week = SALES.filter(s => s.created_at > weekAgo).length;
+  const byT = Object.keys(TARIFFS).map(k => ({k, n: active.filter(s => s.tariff === k).length, sum: active.filter(s => s.tariff === k).length * PRICES[k]}));
+  const conv = active.length ? Math.round(entered / active.length * 100) : 0;
+  $("kpis").innerHTML = `
+    <div class="kpi main"><div class="kpi-top">Выручка<span class="kpi-ico">${icon("wallet")}</span></div><b>${money(sum)}</b><small>по ценам тарифов, без отключённых</small>
+      ${sum ? `<div class="split">${byT.filter(t => t.sum).map(t => `<span style="width:${t.sum / sum * 100}%;background:${COLORS[t.k]}"></span>`).join("")}</div><div class="legend">${byT.map(t => `<span><i style="background:${COLORS[t.k]}"></i>${TARIFFS[t.k]} · ${t.n}</span>`).join("")}</div>` : ""}</div>
+    <div class="kpi"><div class="kpi-top">Продажи<span class="kpi-ico">${icon("users")}</span></div><b>${SALES.length}</b><small>${week ? `+${week} за 7 дней` : "за всё время"}</small></div>
+    <div class="kpi"><div class="kpi-top">Активировали<span class="kpi-ico">${icon("login")}</span></div><b>${entered}<span style="font-size:.55em;color:var(--faint);font-weight:600"> · ${conv}%</span></b><small>вошли на сайт хотя бы раз</small></div>
+    <div class="kpi"><div class="kpi-top">Отключено<span class="kpi-ico">${icon("ban")}</span></div><b>${off}</b><small>ключей без доступа</small></div>`;
+
+  const counts = {all:SALES.length, active:SALES.filter(s => status(s) === "active").length, wait:SALES.filter(s => status(s) === "wait").length, off};
+  const names = {all:"Все", active:"Вошли", wait:"Не входили", off:"Отключены"};
+  $("seg").innerHTML = Object.keys(names).map(k => `<button type="button" data-f="${k}" aria-pressed="${filter === k}">${names[k]}<em>${counts[k]}</em></button>`).join("");
+
+  const q = $("search").value.trim().toLowerCase();
+  const list = SALES.filter(s => (filter === "all" || status(s) === filter) && (!q || [s.name, s.phone, s.key].some(v => String(v || "").toLowerCase().includes(q))));
+  const badge = {active:'<span class="badge b-active">Активен</span>', wait:'<span class="badge b-wait">Не входил</span>', off:'<span class="badge b-off">Отключён</span>'};
+  $("rows").innerHTML = list.length ? list.map(s => `
+    <tr class="${s.revoked ? "off" : ""}">
+      <td class="c-who"><div class="who"><span class="ava" style="background:${avaColor(s.key)}">${esc(initials(s.name))}</span><div><b>${esc(s.name) || "Без имени"}</b><small>${esc(s.phone) || "контакт не указан"}</small></div></div></td>
+      <td class="c-tariff"><select class="tsel" data-tariff="${s.id}" aria-label="Тариф">${Object.entries(TARIFFS).map(([k,v]) => `<option value="${k}" ${k===s.tariff?"selected":""}>${v}</option>`).join("")}</select></td>
+      <td class="c-key" data-l="Ключ"><span class="keycell"><code>${esc(s.key)}</code><button class="iconbtn" type="button" data-copykey="${s.id}" title="Скопировать ключ" aria-label="Скопировать ключ">${icon("copy",14)}</button></span></td>
+      <td class="c-act"><div class="activity">${badge[status(s)]}<small title="${s.last_seen ? "Последний вход: " + dateStr(s.last_seen) + ", " + timeStr(s.last_seen) : ""}">${s.last_seen ? "вход " + ago(s.last_seen) : "создан " + dateStr(s.created_at)}</small></div></td>
+      <td class="c-btns"><div class="actions"><button class="iconbtn" type="button" data-copy="${s.id}" title="Скопировать сообщение покупателю" aria-label="Скопировать сообщение покупателю">${icon("send",15)}</button><button class="iconbtn" type="button" data-toggle="${s.id}" title="${s.revoked ? "Включить ключ" : "Отключить ключ"}" aria-label="${s.revoked ? "Включить ключ" : "Отключить ключ"}">${icon(s.revoked ? "power" : "ban", 15)}</button></div></td>
+    </tr>`).join("")
+    : `<tr><td colspan="5"><div class="empty"><div class="empty-ico">${icon(SALES.length ? "search" : "inbox", 22)}</div><b>${SALES.length ? "Ничего не найдено" : "Продаж пока нет"}</b>${SALES.length ? "Попробуй изменить поиск или фильтр" : "Создай первый ключ в форме слева"}</div></td></tr>`;
+  $("foot").innerHTML = `<span>Показано ${list.length} из ${SALES.length}</span><span>Сумма в списке: <b style="color:var(--text)">${money(list.filter(s => !s.revoked).reduce((a, s) => a + (PRICES[s.tariff] || 0), 0))}</b></span>`;
+  $("listSub").textContent = SALES.length ? `${SALES.length} ${plural(SALES.length, "ключ", "ключа", "ключей")} выдано` : "Все выданные ключи";
+}
+$("search").addEventListener("input", render);
+$("seg").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if(b){ filter = b.dataset.f; render(); } });
+
+function message(s){
+  return `Привет${s.name ? ", " + s.name : ""}! Доступ к обучению «Бизнес на нейросетях» открыт.\n\nСайт: ${SITE}\nТвой ключ: ${s.key}\nТариф: ${TARIFFS[s.tariff]}\n\nЗайди на сайт, вставь ключ и начинай с урока 0.1.`;
+}
+
+// ---------- новая продажа ----------
+$("saleForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const tariff = document.querySelector("input[name=tariff]:checked").value;
+  const name = $("name").value.trim(), phone = $("phone").value.trim();
+  $("saleErr").textContent = "";
+  const b = $("saleBtn"); b.disabled = true; b.innerHTML = '<span class="spinner"></span>Создаём…';
+  try {
+    const {key} = await api("/api/admin/sales", {method:"POST", body: JSON.stringify({tariff, name, phone})});
+    last = {key, tariff, name};
+    $("resKey").textContent = key; $("resName").textContent = name || "покупателя"; $("resTariff").textContent = TARIFFS[tariff];
+    $("result").classList.remove("hidden"); $("result").style.animation = "none"; void $("result").offsetWidth; $("result").style.animation = "";
+    $("name").value = ""; $("phone").value = "";
+    await loadSales();
+    toast("Ключ создан");
+  } catch(err){ $("saleErr").innerHTML = errHtml(netMsg(err)); }
+  finally { b.disabled = false; b.innerHTML = icon("key") + "Создать ключ"; }
+});
+$("copyKey").addEventListener("click", () => last && copy(last.key, "Ключ скопирован"));
+$("copyMsg").addEventListener("click", () => last && copy(message(last), "Сообщение скопировано"));
+
+// ---------- действия в таблице ----------
+$("rows").addEventListener("click", async e => {
+  const find = id => SALES.find(x => x.id == id);
+  const k = e.target.closest("[data-copykey]");
+  if(k){ const s = find(k.dataset.copykey); if(s) copy(s.key, "Ключ скопирован"); return; }
+  const c = e.target.closest("[data-copy]");
+  if(c){ const s = find(c.dataset.copy); if(s) copy(message(s), "Сообщение скопировано"); return; }
+  const t = e.target.closest("[data-toggle]");
+  if(t){
+    const s = find(t.dataset.toggle); if(!s) return;
+    if(!s.revoked && !confirm(`Отключить ключ ${s.key}?\nПокупатель потеряет доступ к урокам. Ключ можно будет включить обратно.`)) return;
+    try { await api(`/api/admin/sales/${s.id}`, {method:"POST", body: JSON.stringify({revoked: !s.revoked})}); toast(s.revoked ? "Ключ включён" : "Ключ отключён"); await loadSales(); }
+    catch(err){ toast(netMsg(err), true); }
+  }
+});
+$("rows").addEventListener("change", async e => {
+  const sel = e.target.closest("[data-tariff]"); if(!sel) return;
+  try { await api(`/api/admin/sales/${sel.dataset.tariff}`, {method:"POST", body: JSON.stringify({tariff: sel.value})}); toast("Тариф изменён на «" + TARIFFS[sel.value] + "»"); await loadSales(); }
+  catch(err){ toast(netMsg(err), true); }
+});
+
+// ---------- выгрузка ----------
+$("csvBtn").addEventListener("click", () => {
+  const head = ["Дата", "Имя", "Контакт", "Тариф", "Цена", "Ключ", "Последний вход", "Статус"];
+  const st = {active:"активен", wait:"не входил", off:"отключён"};
+  const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.name, s.phone, TARIFFS[s.tariff] || s.tariff, PRICES[s.tariff] || "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)]]);
+  const csv = "﻿" + [head, ...rows].map(r => r.map(cell).join(";")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+  a.download = `prodazhi-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+// ---------- уведомления ----------
+let toastTimer;
+function toast(msg, bad){ const t = $("toast"); t.className = "toast" + (bad ? " bad" : ""); t.innerHTML = `<i>${icon(bad ? "alert" : "check", 13)}</i>${esc(msg)}`; void t.offsetWidth; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200); }
+async function copy(s, msg = "Скопировано"){
+  try { await navigator.clipboard.writeText(s); toast(msg); }
+  catch(e){ const ta = document.createElement("textarea"); ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); toast(msg); } catch(err){ toast("Не удалось скопировать", true); } ta.remove(); }
+}
+
+if(PASS) api("/api/admin/login", {method:"POST"}).then(openPanel).catch(showLogin);
+else showLogin();
+</script>
+</body>
+</html>
