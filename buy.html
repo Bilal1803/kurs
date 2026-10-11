@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Обучение «Бизнес на нейросетях»: от первого сообщения нейросети до своих сайтов, Telegram-ботов и первых заказов. Три тарифа.">
+<meta name="theme-color" content="#0F100D">
+<title>Бизнес на нейросетях · обучение</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230F100D'/%3E%3Cpath d='M16 6l2.3 6.7L25 15l-6.7 2.3L16 24l-2.3-6.7L7 15l6.7-2.3z' fill='%23C5F23A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#F5F5F1; --surface:#FFFFFF; --surface-2:#F9F9F6; --line:#E7E6E0; --line-strong:#D3D2CA;
+  --text:#151612; --muted:#676862; --faint:#9A9B94;
+  --ink:#0F100D; --ink-text:#EDEEE8; --ink-muted:#8E8F88;
+  --accent:#C5F23A; --accent-hover:#B4E224; --on-accent:#0F100D; --accent-soft:#EEF8CC; --accent-text:#4A6100; --bullet:#86AE0B;
+  --r:14px; --r-lg:22px; --r-xl:30px;
+  --shadow:0 2px 4px rgba(15,16,13,.04),0 24px 60px -24px rgba(15,16,13,.25);
+  --font:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.6 var(--font);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+svg{flex-shrink:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:14px;border:1px solid transparent;font:600 16px/1 var(--font);text-decoration:none;white-space:nowrap;cursor:pointer;transition:background .15s,transform .15s,border-color .15s}
+.btn:active{transform:translateY(1px)}
+.btn-accent{background:var(--accent);color:var(--on-accent)}
+.btn-accent:hover{background:var(--accent-hover)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:#25261F}
+.btn-ghost{border-color:var(--line-strong);color:var(--text);background:transparent}
+.btn-ghost:hover{border-color:var(--text)}
+.chip{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px;border-radius:999px;font-size:13.5px;font-weight:600;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#CFD0C9}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(197,242,58,.18)}
+
+/* шапка и первый экран */
+.hero{position:relative;overflow:hidden;background:var(--ink);color:var(--ink-text)}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(640px 420px at 85% 0%,rgba(197,242,58,.18),transparent 70%),radial-gradient(500px 360px at 0% 100%,rgba(197,242,58,.08),transparent 70%);pointer-events:none}
+.hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 30%,transparent 80%);pointer-events:none}
+.hero .wrap{position:relative;z-index:1}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:26px 0}
+.logo{display:inline-flex;align-items:center;gap:11px;font-weight:700;font-size:16px;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.nav a.login{color:#B5B6AF;text-decoration:none;font-size:15px;font-weight:500;padding:10px 4px}
+.nav a.login:hover{color:#fff}
+.hero-in{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:56px;align-items:center;padding:56px 0 88px}
+.hero h1{font-size:clamp(40px,5.8vw,70px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:24px 0 20px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p.lead{font-size:19px;line-height:1.6;color:#B5B6AF;max-width:540px;margin:0 0 34px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px}
+.hero .btn-ghost{border-color:#34352F;color:#EDEEE8}
+.hero .btn-ghost:hover{border-color:#8E8F88}
+.facts{display:grid;gap:12px}
+.fact{display:flex;align-items:center;gap:16px;padding:20px 22px;border-radius:var(--r-lg);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.fact b{font-size:34px;font-weight:800;letter-spacing:-.04em;color:var(--accent);min-width:74px;line-height:1}
+.fact span{font-size:15px;color:#B5B6AF;line-height:1.4}
+
+/* секции */
+section.s{padding:84px 0}
+.s-head{max-width:640px;margin-bottom:44px}
+.s-head h2{font-size:clamp(30px,4vw,44px);line-height:1.08;letter-spacing:-.03em;font-weight:800;margin:0 0 12px}
+.s-head p{margin:0;color:var(--muted);font-size:18px}
+.kicker{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text);margin-bottom:12px}
+
+/* программа */
+.levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.lv{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px}
+.lv-n{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:var(--ink);color:var(--accent);font-weight:800;font-size:19px;margin-bottom:16px}
+.lv h3{margin:0 0 6px;font-size:19px;letter-spacing:-.015em}
+.lv p{margin:0;color:var(--muted);font-size:15px;line-height:1.5}
+.lv small{display:block;margin-top:14px;font-size:13px;font-weight:600;color:var(--faint)}
+
+/* тарифы */
+.plans-bg{background:var(--surface);border-block:1px solid var(--line)}
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
+.plan{position:relative;display:flex;flex-direction:column;background:var(--bg);border:1.5px solid var(--line);border-radius:var(--r-xl);padding:34px 30px 30px}
+.plan.hot{background:var(--ink);color:var(--ink-text);border-color:var(--ink);box-shadow:var(--shadow)}
+.plan .tag{position:absolute;top:-14px;left:30px;height:28px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;background:var(--accent);color:var(--on-accent);font-size:12.5px;font-weight:700}
+.plan h3{margin:0;font-size:24px;letter-spacing:-.025em}
+.plan .for{margin:6px 0 22px;color:var(--muted);font-size:15px;min-height:46px}
+.plan.hot .for{color:var(--ink-muted)}
+.price{display:flex;align-items:baseline;gap:6px;margin-bottom:24px}
+.price b{font-size:46px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.price span{font-size:22px;font-weight:700}
+.plan ul{list-style:none;margin:0 0 30px;padding:0;display:grid;gap:12px;flex:1}
+.plan li{display:flex;gap:11px;align-items:flex-start;font-size:15.5px;line-height:1.45}
+.plan li svg{margin-top:3px;color:var(--bullet)}
+.plan.hot li svg{color:var(--accent)}
+.plan li.off{color:var(--faint)}
+.plan li.off svg{color:var(--line-strong)}
+.plan .btn{width:100%}
+.plan:not(.hot) .btn{background:var(--ink);color:#fff}
+.plan:not(.hot) .btn:hover{background:#25261F}
+.note{margin:26px 0 0;text-align:center;color:var(--muted);font-size:15px}
+
+/* как это работает */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;counter-reset:st}
+.st{position:relative;padding:28px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line)}
+.st::before{counter-increment:st;content:counter(st);display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--on-accent);font-weight:800;margin-bottom:16px}
+.st h3{margin:0 0 6px;font-size:19px}
+.st p{margin:0;color:var(--muted);font-size:15.5px}
+
+/* вопросы */
+.faq{max-width:760px;display:grid;gap:10px}
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0 22px}
+.faq summary{cursor:pointer;list-style:none;padding:20px 28px 20px 0;font-weight:600;font-size:17px;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:24px;font-weight:400;color:var(--muted)}
+.faq details[open] summary::after{content:"–"}
+.faq details p{margin:0 0 20px;color:var(--muted);font-size:16px}
+
+/* финал */
+.final{background:var(--ink);color:var(--ink-text);border-radius:var(--r-xl);padding:56px;display:flex;align-items:center;justify-content:space-between;gap:32px;position:relative;overflow:hidden}
+.final::before{content:"";position:absolute;right:-100px;top:-140px;width:420px;height:420px;border-radius:50%;background:radial-gradient(closest-side,rgba(197,242,58,.22),transparent)}
+.final > *{position:relative}
+.final h2{margin:0 0 8px;font-size:clamp(28px,3.6vw,38px);letter-spacing:-.03em;font-weight:800}
+.final p{margin:0;color:#B5B6AF;max-width:480px}
+footer{padding:40px 0 56px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{text-decoration:none;border-bottom:1px solid var(--line-strong)}
+
+/* всплывающее окно покупки */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(10,11,8,.6);backdrop-filter:blur(3px)}
+.modal[hidden]{display:none}
+.modal-box{position:relative;width:100%;max-width:480px;background:var(--surface);border-radius:var(--r-xl);padding:34px;box-shadow:var(--shadow);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.modal-x{position:absolute;right:16px;top:16px;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.modal-box h2{margin:0 0 6px;font-size:26px;letter-spacing:-.03em;font-weight:800}
+.modal-box .sub{margin:0 0 20px;color:var(--muted);font-size:15px}
+.sum{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-radius:16px;background:var(--accent);color:var(--on-accent);font-weight:600;margin-bottom:18px}
+.sum b{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.field label span{font-weight:400;color:var(--faint)}
+.field input{width:100%;height:50px;border:1.5px solid var(--line-strong);border-radius:12px;padding:0 14px;font:500 16px var(--font);background:var(--surface-2);color:var(--text)}
+.field input:focus{outline:none;border-color:var(--text);box-shadow:0 0 0 4px rgba(197,242,58,.4);background:#fff}
+.modal-box .btn{width:100%;margin-top:6px}
+.modal-box .fine{margin:14px 0 0;font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+
+@media (max-width:900px){
+  .hero-in{grid-template-columns:1fr;gap:36px;padding:32px 0 64px}
+  .levels,.plans,.steps{grid-template-columns:1fr}
+  .plan .for{min-height:0}
+  .final{flex-direction:column;align-items:flex-start;padding:36px 26px}
+  section.s{padding:60px 0}
+}
+@media (max-width:560px){
+  .wrap{padding:0 18px}
+  .hero-cta .btn,.final .btn{width:100%}
+  .modal{padding:0;place-items:end stretch}
+  .modal-box{border-radius:24px 24px 0 0;padding:28px 20px calc(22px + env(safe-area-inset-bottom,0px))}
+}
+</style>
+<script src="config.js?v=4"></script>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="#"><span class="logo-mark"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z"/></svg></span>Бизнес на нейросетях</a>
+      <a class="login" href="./">Уже есть ключ? Войти</a>
+    </nav>
+    <div class="hero-in">
+      <div>
+        <span class="chip"><i></i>Обучение с нуля, без опыта в программировании</span>
+        <h1>Зарабатывай <em>на нейросетях</em>: сайты, боты и дизайн для бизнеса</h1>
+        <p class="lead">Пошаговый курс: от первого сообщения нейросети до готовых сайтов, Telegram-ботов и первых клиентов. Всё на русском, с готовыми промптами, шаблонами и заданиями.</p>
+        <div class="hero-cta">
+          <a class="btn btn-accent" href="#plans">Выбрать тариф</a>
+          <a class="btn btn-ghost" href="#program">Программа курса</a>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="fact"><b id="fLessons">45</b><span>уроков с заданиями и готовыми промптами</span></div>
+        <div class="fact"><b>3</b><span>направления: дизайн, сайты и Telegram-боты</span></div>
+        <div class="fact"><b>4</b><span>набора материалов: шаблоны сайтов, бот записи, документы, шпаргалка промптов</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="s" id="program">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="kicker">Программа</span>
+      <h2>Путь от новичка до первых заказов</h2>
+      <p>Каждый уровень опирается на предыдущий. После каждого урока есть практическое задание.</p>
+    </div>
+    <div class="levels">
+      <div class="lv"><div class="lv-n">0</div><h3>Что такое нейросеть</h3><p>Как это устроено, где регистрироваться, как вести первый разговор.</p><small>4 урока</small></div>
+      <div class="lv"><div class="lv-n">1</div><h3>Первые результаты</h3><p>Как ставить задачу, чтобы нейросеть делала нужное: тексты, картинки, первая страница.</p><small>5 уроков</small></div>
+      <div class="lv"><div class="lv-n">2</div><h3>Дизайн</h3><p>Карточки для Wildberries и Ozon, логотипы, оформление соцсетей, портфолио.</p><small>6 уроков</small></div>
+      <div class="lv"><div class="lv-n">3</div><h3>Сайты</h3><p>Сайт для бизнеса от начала до публикации и сдачи клиенту.</p><small>8 уроков</small></div>
+      <div class="lv"><div class="lv-n">4</div><h3>Telegram-боты</h3><p>Бот записи, запуск на сервере и ежемесячная оплата за поддержку.</p><small>6 уроков</small></div>
+      <div class="lv"><div class="lv-n">5</div><h3>Свои продукты</h3><p>Базы данных, личные кабинеты, оплата, Mini App и сервисы по подписке.</p><small>8 уроков</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="s plans-bg" id="plans">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="kicker">Тарифы</span>
+      <h2>Выбери свой тариф</h2>
+      <p>Тариф можно повысить позже: доплачиваешь только разницу, ключ остаётся тем же.</p>
+    </div>
+    <div class="plans" id="plans-list"></div>
+    <p class="note">Нажми «Купить»: откроется чат с наставником в Telegram, а сообщение с выбранным тарифом уже будет написано.</p>
+  </div>
+</section>
+
+<section class="s">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="kicker">Как это работает</span>
+      <h2>Три шага до начала обучения</h2>
+    </div>
+    <div class="steps">
+      <div class="st"><h3>Выбираешь тариф</h3><p>Нажимаешь «Купить» у нужного тарифа и пишешь наставнику в Telegram. Сообщение уже готово, остаётся отправить.</p></div>
+      <div class="st"><h3>Оплачиваешь</h3><p>Наставник пришлёт реквизиты и ответит на вопросы. Если не уверен в выборе, спроси, какой тариф подойдёт именно тебе.</p></div>
+      <div class="st"><h3>Получаешь ключ</h3><p>После оплаты тебе приходит личный ключ. Вводишь его на сайте, и уроки твоего тарифа открыты.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="s" style="padding-top:0">
+  <div class="wrap">
+    <div class="s-head"><span class="kicker">Вопросы</span><h2>Частые вопросы</h2></div>
+    <div class="faq">
+      <details><summary>Нужно ли уметь программировать?</summary><p>Нет. Код пишет нейросеть. Твоя задача: понять, что нужно клиенту, объяснить это нейросети, проверить результат и довести до готового. Именно этому учит курс.</p></details>
+      <details><summary>Что нужно для обучения?</summary><p>Телефон или компьютер. Для уровня с Telegram-ботами и сайтами лучше компьютер. Доступ к нейросетям и подписки в курсе настроим вместе с наставником.</p></details>
+      <details><summary>Сколько можно заработать?</summary><p>Ориентиры из курса: сайт для бизнеса от 20 000 ₽, бот от 15 000 ₽, карточки для маркетплейсов от 400 ₽ за штуку. Доход зависит от того, сколько клиентов ты найдёшь, поэтому в тарифах «Заработок» и «Наставник» есть блок про поиск клиентов.</p></details>
+      <details><summary>Как я получу доступ?</summary><p>После оплаты наставник пришлёт ключ вида AI-XXXX-XXXX-XXXX. Его нужно ввести на странице входа, и обучение откроется. Ключ остаётся тем же, даже если ты повысишь тариф.</p></details>
+      <details><summary>Можно ли потом перейти на старший тариф?</summary><p>Да. Нажми «Повысить тариф» внутри курса: покажем доплату, и откроется чат с наставником. Платишь только разницу между тарифами.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="s" style="padding-top:0">
+  <div class="wrap">
+    <div class="final">
+      <div><h2>Начни с первого урока уже сегодня</h2><p>Выбери тариф и напиши наставнику: ответит на вопросы и подскажет, с чего лучше начать.</p></div>
+      <a class="btn btn-accent" href="#plans">Выбрать тариф</a>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap"><span>© <span id="year"></span> Бизнес на нейросетях</span><span>Есть вопросы? <a id="contact" href="#" target="_blank" rel="noopener">Напиши в Telegram</a></span></div></footer>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal-box">
+    <button class="modal-x" type="button" id="mClose" aria-label="Закрыть"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+    <h2 id="mTitle"></h2>
+    <p class="sub" id="mSub"></p>
+    <div class="sum"><span>К оплате</span><b id="mPrice"></b></div>
+    <div class="field"><label for="mName">Как к тебе обращаться? <span>· необязательно</span></label><input id="mName" autocomplete="given-name" maxlength="60" placeholder="Например, Артём"></div>
+    <a class="btn btn-accent" id="mGo" href="#" target="_blank" rel="noopener">Написать в Telegram</a>
+    <p class="fine">Откроется чат с наставником. Сообщение уже написано, останется нажать «Отправить».</p>
+  </div>
+</div>
+
+<script>
+const CFG = window.CONFIG || {};
+const TARIFFS = CFG.TARIFFS || [];
+const CONTACT = (CFG.CONTACT_URL || "https://t.me/styllec").replace(/\/$/, "");
+const $ = id => document.getElementById(id);
+const rub = n => n.toLocaleString("ru-RU") + " ₽";
+const ok = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+const no = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg>';
+
+// что входит в каждый тариф
+const PLAN = {
+  start: {
+    for: "Чтобы освоить нейросети и научиться делать дизайн, сайты и ботов.",
+    items: [[1,"38 уроков: уровни 0–5 и урок «Первый клиент»"],[1,"Шпаргалка из 20 промптов"],[1,"4 готовых шаблона сайтов"],[1,"Готовый бот записи для Telegram"],[0,"Блок «Поиск клиентов» (5 уроков)"],[0,"Документы для работы с клиентами"],[0,"Личная поддержка наставника"]]
+  },
+  earn: {
+    for: "Если хочешь не только уметь, но и находить клиентов и получать первые заказы.",
+    items: [[1,"43 урока: всё из «Старта» и весь блок «Поиск клиентов»"],[1,"Объявления на Авито, скрипты сообщений, переписка и сделка"],[1,"Бриф, прайс, шаблон оферты, таблица клиентов"],[1,"Шаблоны сайтов, бот записи и шпаргалка промптов"],[0,"Личная поддержка наставника"],[0,"Схема 50/50 для тех, кто без ноутбука"]],
+    hot: true, tag: "Популярный"
+  },
+  mentor: {
+    for: "Для тех, кому нужен результат быстрее: наставник ведёт тебя лично до первых денег.",
+    items: [[1,"Все 45 уроков и все материалы"],[1,"Созвон-знакомство и план на первый месяц"],[1,"Разбор каждой твоей работы с конкретными правками"],[1,"Помощь с перепиской, ценой и сложными клиентами"],[1,"Ответы в личном чате в течение дня"],[1,"Схема 50/50 для тех, кто без ноутбука"]]
+  }
+};
+
+function message(t, name){
+  return `Здравствуйте!${name ? " Меня зовут " + name + "." : ""} Хочу купить курс «Бизнес на нейросетях», тариф «${t.name}» (${rub(t.price)}). Подскажите, как оплатить.`;
+}
+
+$("plans-list").innerHTML = TARIFFS.map(t => {
+  const p = PLAN[t.id] || {for: t.desc, items: []};
+  return `<article class="plan${p.hot ? " hot" : ""}">${p.tag ? `<span class="tag">${p.tag}</span>` : ""}
+    <h3>${t.name}</h3><p class="for">${p.for}</p>
+    <div class="price"><b>${t.price.toLocaleString("ru-RU")}</b><span>₽</span></div>
+    <ul>${p.items.map(([on, text]) => `<li class="${on ? "" : "off"}">${on ? ok : no}<span>${text}</span></li>`).join("")}</ul>
+    <button class="btn ${p.hot ? "btn-accent" : ""}" type="button" data-buy="${t.id}">Купить</button></article>`;
+}).join("");
+
+// окно покупки
+let current = null;
+function paint(){
+  $("mGo").href = CONTACT + "?text=" + encodeURIComponent(message(current, $("mName").value.trim()));
+}
+function open(id){
+  current = TARIFFS.find(t => t.id === id); if(!current) return;
+  $("mTitle").textContent = "Тариф «" + current.name + "»";
+  $("mSub").textContent = current.desc;
+  $("mPrice").textContent = rub(current.price);
+  paint(); $("modal").hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(() => $("mName").focus(), 50);
+}
+function close(){ $("modal").hidden = true; document.body.style.overflow = ""; }
+document.addEventListener("click", e => { const b = e.target.closest("[data-buy]"); if(b) open(b.dataset.buy); });
+$("mName").addEventListener("input", paint);
+$("mClose").addEventListener("click", close);
+$("modal").addEventListener("click", e => { if(e.target === $("modal")) close(); });
+$("mGo").addEventListener("click", () => setTimeout(close, 300));
+document.addEventListener("keydown", e => { if(e.key === "Escape") close(); });
+$("contact").href = CONTACT;
+$("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
