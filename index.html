@@ -127,6 +127,25 @@ svg{flex-shrink:0}
 [data-theme="dark"] .login-help{border-color:var(--line);color:var(--muted)}
 .login-help a{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--accent);text-decoration-thickness:2px}
 .gate-foot{display:flex;justify-content:space-between;gap:16px;padding-bottom:28px;font-size:13px;color:#6E6F68}
+.gate-foot a{color:inherit}
+/* экран принятия договора */
+.accept-main{flex:1;display:flex;align-items:center;justify-content:center;padding-top:40px;padding-bottom:40px}
+.accept-card{max-width:620px;width:100%}
+.accept-card .step{display:inline-block;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#676862;margin-bottom:10px}
+.accept-terms{list-style:none;margin:0 0 24px;padding:18px 20px;border-radius:16px;background:#F7F7F3;border:1px solid #ECEBE5;display:grid;gap:10px;font-size:14.5px;line-height:1.5;color:#3A3B36}
+[data-theme="dark"] .accept-terms{background:var(--bg);border-color:var(--line);color:var(--muted)}
+.accept-terms li{display:flex;gap:10px;align-items:flex-start}
+.accept-terms li svg{flex:none;margin-top:3px;color:#7FA312}
+.check{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1.5px solid #E2E1DA;border-radius:14px;cursor:pointer;font-size:15px;line-height:1.5;margin-bottom:10px;transition:border-color .15s,background .15s}
+[data-theme="dark"] .check{border-color:var(--line-strong)}
+.check:hover{border-color:#B8B9B2}
+.check:has(input:checked){border-color:#151612;background:rgba(197,242,58,.12)}
+[data-theme="dark"] .check:has(input:checked){border-color:var(--accent)}
+.check input{flex:none;width:20px;height:20px;margin:2px 0 0;accent-color:#151612;cursor:pointer}
+[data-theme="dark"] .check input{accent-color:var(--accent)}
+.check a{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--accent);text-decoration-thickness:2px}
+.accept-card .btn:disabled{opacity:.45;cursor:not-allowed}
+.accept-note{margin:14px 0 0;font-size:13px;color:#8A8B84;line-height:1.5}
 @media (max-width:960px){
   .gate-main{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:32px}
   .gate-intro{display:contents}
@@ -478,7 +497,36 @@ a.lcard:hover .lcard-go{background:var(--ink);color:#fff;border-color:var(--ink)
       <div class="login-help">Ещё нет доступа? <a href="buy.html">Выбрать тариф и купить</a>. Ключ не подходит? <a class="contact-link" href="#" target="_blank" rel="noopener">Напиши наставнику</a>.</div>
     </div>
   </div>
-  <footer class="gate-foot"><span>© <span id="year"></span> Бизнес на нейросетях</span><span>Материалы курса доступны только ученикам</span></footer>
+  <footer class="gate-foot"><span>© <span id="year"></span> Бизнес на нейросетях</span><span><a href="oferta.html" target="_blank">Договор-оферта</a> · <a href="privacy.html" target="_blank">Политика конфиденциальности</a></span></footer>
+</section>
+
+<section class="gate hidden" id="acceptScreen">
+  <header class="gate-top">
+    <div class="logo"><span class="logo-mark" data-icon="spark"></span><span>Бизнес на нейросетях<small>платформа обучения</small></span></div>
+    <a class="help contact-link" href="#" target="_blank" rel="noopener">Поддержка</a>
+  </header>
+  <div class="gate-main accept-main">
+    <div class="login-card accept-card">
+      <span class="step">Последний шаг перед уроками</span>
+      <h2 id="acceptTitle">Подтверди условия обучения</h2>
+      <p>Прочитай документы по ссылкам и отметь обе галочки. Это нужно один раз.</p>
+      <ul class="accept-terms" id="acceptTerms">
+        <li>Ключ доступа личный: его нельзя передавать другим людям.</li>
+        <li>Материалы уроков нельзя копировать и распространять. Шаблоны, промпты и код можно использовать в работе для своих клиентов.</li>
+        <li>Доход зависит от твоих действий: курс даёт знания и инструменты, но не гарантирует заработок.</li>
+        <li>Возврат возможен по правилам раздела 9 договора.</li>
+      </ul>
+      <form id="acceptForm" novalidate>
+        <label class="check"><input type="checkbox" id="agreeOffer"><span>Мне исполнилось 18 лет. Я прочитал(а) и принимаю условия <a href="oferta.html" target="_blank">Договора-оферты</a></span></label>
+        <label class="check"><input type="checkbox" id="agreePd"><span>Я даю <a href="consent.html" target="_blank">согласие на обработку персональных данных</a> на условиях <a href="privacy.html" target="_blank">Политики обработки персональных данных</a></span></label>
+        <button class="btn btn-accent btn-lg" id="acceptBtn" type="submit" disabled>Принять и перейти к урокам</button>
+        <div class="gate-error" id="acceptError" role="alert"></div>
+      </form>
+      <p class="accept-note">Нажимая кнопку, ты заключаешь договор на условиях оферты. Дата, время и версия документов сохраняются.</p>
+      <div class="login-help">Не тот ключ? <a href="#" id="acceptExit">Выйти и ввести другой</a>.</div>
+    </div>
+  </div>
+  <footer class="gate-foot"><span>© 2026 Бизнес на нейросетях</span><span>Документы открываются в новой вкладке</span></footer>
 </section>
 
 <div class="app hidden" id="app">
@@ -600,6 +648,39 @@ function start(data, key){
 
 function showGate(){ $("boot").classList.add("hidden"); $("gate").classList.remove("hidden"); }
 
+// ---------- принятие договора-оферты и согласия на обработку ПДн ----------
+// без двух галочек сервер не отдаёт уроки, поэтому этот экран нельзя пропустить
+function enter(data, key){ data.needs_accept ? showAccept(data, key) : start(data, key); }
+function showAccept(data, key){
+  $("boot").classList.add("hidden"); $("gate").classList.add("hidden"); $("app").classList.add("hidden");
+  $("acceptScreen").classList.remove("hidden");
+  const name = (data.name || "").trim().split(/\s+/)[0];
+  $("acceptTitle").textContent = (name ? name + ", подтверди" : "Подтверди") + " условия обучения";
+  const form = $("acceptForm"), btn = $("acceptBtn"), a = $("agreeOffer"), b = $("agreePd");
+  const sync = () => { btn.disabled = !(a.checked && b.checked); $("acceptError").textContent = ""; };
+  a.onchange = b.onchange = sync; sync();
+  form.onsubmit = async e => {
+    e.preventDefault();
+    if(!(a.checked && b.checked)) return;
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Сохраняем…';
+    try {
+      const res = await fetch(API + "/api/accept", {method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({key, version: data.docs_version, agree_offer: true, agree_pd: true})});
+      const r = await res.json().catch(() => ({}));
+      if(!res.ok) throw new Error(r.detail || "Не получилось сохранить. Попробуй ещё раз.");
+      const fresh = await login(key);
+      $("acceptScreen").classList.add("hidden");
+      enter(fresh, key);
+    } catch(ex){
+      btn.innerHTML = "Принять и перейти к урокам" + icon("right", 18); btn.disabled = false;
+      $("acceptError").innerHTML = icon("alert", 16) + "<span>" + esc(ex.message === "Failed to fetch" ? "Нет связи с сервером. Проверь интернет." : ex.message) + "</span>";
+    }
+  };
+}
+$("acceptBtn").innerHTML = "Принять и перейти к урокам" + icon("right", 18);
+$("acceptTerms").querySelectorAll("li").forEach(li => li.insertAdjacentHTML("afterbegin", icon("check", 16)));
+$("acceptExit").addEventListener("click", e => { e.preventDefault(); store.del("courseKey"); location.hash = ""; location.reload(); });
+
 // ---------- форма входа ----------
 const keyInput = $("keyInput");
 function normKey(v){
@@ -620,7 +701,7 @@ $("keyForm").addEventListener("submit", async e => {
   if(!key){ err("Вставь ключ, который пришёл после оплаты."); keyInput.focus(); return; }
   const btn = $("keyBtn");
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Проверяем ключ…'; $("gateError").textContent = "";
-  try { const data = await login(key); store.set("courseKey", key); start(data, key); }
+  try { const data = await login(key); store.set("courseKey", key); enter(data, key); }
   catch(ex){ err(ex.message === "Failed to fetch" ? "Нет связи с сервером. Проверь интернет и попробуй ещё раз." : ex.message); }
   finally { btn.disabled = false; btn.innerHTML = "Открыть обучение" + icon("right", 18); }
 });
@@ -928,7 +1009,7 @@ async function copyText(s){
   const saved = store.get("courseKey");
   if(!saved){ showGate(); return; }
   keyInput.value = saved;
-  try { start(await login(saved), saved); }
+  try { enter(await login(saved), saved); }
   catch(e){
     if(e.status === 403) store.del("courseKey");
     showGate();

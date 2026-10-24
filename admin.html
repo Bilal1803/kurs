@@ -186,6 +186,9 @@ td.c-btns{width:1%}
 .b-active{background:var(--accent-soft);color:var(--accent-text)}
 .b-wait{background:var(--warn-soft);color:var(--warn-text)}
 .b-off{background:var(--danger-soft);color:var(--danger)}
+.b-doc{background:transparent;border:1px solid var(--line);color:var(--muted);height:22px;font-weight:500}
+.b-doc.ok{color:var(--accent-text);border-color:var(--accent-soft)}
+.b-doc.no{color:var(--warn-text);border-color:var(--warn-soft)}
 .actions{display:flex;gap:6px;justify-content:flex-end}
 .empty{padding:56px 22px;text-align:center;color:var(--muted)}
 .empty-ico{width:52px;height:52px;margin:0 auto 14px;border-radius:14px;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--line);color:var(--faint)}
@@ -434,6 +437,10 @@ function ago(ts){
 const initials = n => (n || "").trim() ? n.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase() : "?";
 const AVA = ["#D8F86A","#9FD0FF","#FFB86B","#C9B8FF","#7EE0C3","#FF9FB2"];
 const avaColor = s => AVA[[...String(s)].reduce((a, c) => a + c.charCodeAt(0), 0) % AVA.length];
+const docsAt = s => s.accepted_at ? dateStr(s.accepted_at) + " " + timeStr(s.accepted_at) : "";
+const docBadge = s => s.docs_ok
+  ? `<span class="badge b-doc ok" title="Договор-оферта и согласие на ПДн приняты ${docsAt(s)}, IP ${esc(s.accepted_ip || "?")}">Договор принят · ${dateStr(s.accepted_at)}</span>`
+  : `<span class="badge b-doc no" title="${s.accepted_at ? "Принята старая редакция " + esc(s.accepted_version || "") + ". Ученик примет новую при следующем входе" : "Ученик ещё не отметил галочки, уроки ему закрыты"}">${s.accepted_at ? "Нужна новая редакция" : "Договор не принят"}</span>`;
 const status = s => s.revoked ? "off" : s.last_seen ? "active" : "wait";
 const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? b : c); };
 
@@ -466,7 +473,7 @@ function render(){
       <td class="c-who"><div class="who"><span class="ava" style="background:${avaColor(s.key)}">${esc(initials(s.name))}</span><div><b>${esc(s.name) || "Без имени"}</b><small>${esc(s.phone) || "контакт не указан"}</small></div></div></td>
       <td class="c-tariff"><select class="tsel" data-tariff="${s.id}" aria-label="Тариф">${Object.entries(TARIFFS).map(([k,v]) => `<option value="${k}" ${k===s.tariff?"selected":""}>${v}</option>`).join("")}</select></td>
       <td class="c-key" data-l="Ключ"><span class="keycell"><code>${esc(s.key)}</code><button class="iconbtn" type="button" data-copykey="${s.id}" title="Скопировать ключ" aria-label="Скопировать ключ">${icon("copy",14)}</button></span></td>
-      <td class="c-act"><div class="activity">${badge[status(s)]}<small title="${s.last_seen ? "Последний вход: " + dateStr(s.last_seen) + ", " + timeStr(s.last_seen) : ""}">${s.last_seen ? "вход " + ago(s.last_seen) : "создан " + dateStr(s.created_at)}</small></div></td>
+      <td class="c-act"><div class="activity">${badge[status(s)]}<small title="${s.last_seen ? "Последний вход: " + dateStr(s.last_seen) + ", " + timeStr(s.last_seen) : ""}">${s.last_seen ? "вход " + ago(s.last_seen) : "создан " + dateStr(s.created_at)}</small>${docBadge(s)}</div></td>
       <td class="c-btns"><div class="actions"><button class="iconbtn" type="button" data-copy="${s.id}" title="Скопировать сообщение покупателю" aria-label="Скопировать сообщение покупателю">${icon("send",15)}</button><button class="iconbtn" type="button" data-toggle="${s.id}" title="${s.revoked ? "Включить ключ" : "Отключить ключ"}" aria-label="${s.revoked ? "Включить ключ" : "Отключить ключ"}">${icon(s.revoked ? "power" : "ban", 15)}</button></div></td>
     </tr>`).join("")
     : `<tr><td colspan="5"><div class="empty"><div class="empty-ico">${icon(SALES.length ? "search" : "inbox", 22)}</div><b>${SALES.length ? "Ничего не найдено" : "Продаж пока нет"}</b>${SALES.length ? "Попробуй изменить поиск или фильтр" : "Создай первый ключ в форме слева"}</div></td></tr>`;
@@ -477,7 +484,7 @@ $("search").addEventListener("input", render);
 $("seg").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if(b){ filter = b.dataset.f; render(); } });
 
 function message(s){
-  return `Привет${s.name ? ", " + s.name : ""}! Доступ к обучению «Бизнес на нейросетях» открыт.\n\nСайт: ${SITE}\nТвой ключ: ${s.key}\nТариф: ${TARIFFS[s.tariff]}\n\nЗайди на сайт, вставь ключ и начинай с урока 0.1.`;
+  return `Привет${s.name ? ", " + s.name : ""}! Доступ к обучению «Бизнес на нейросетях» открыт.\n\nСайт: ${SITE}\nТвой ключ: ${s.key}\nТариф: ${TARIFFS[s.tariff]}\n\nЗайди на сайт, вставь ключ, прочитай и подтверди договор-оферту и начинай с урока 0.1.`;
 }
 
 // ---------- новая продажа ----------
@@ -524,10 +531,10 @@ $("rows").addEventListener("change", async e => {
 
 // ---------- выгрузка ----------
 $("csvBtn").addEventListener("click", () => {
-  const head = ["Дата", "Имя", "Контакт", "Тариф", "Цена", "Ключ", "Последний вход", "Статус"];
+  const head = ["Дата", "Имя", "Контакт", "Тариф", "Цена", "Ключ", "Последний вход", "Статус", "Договор и согласие ПДн", "Дата принятия", "Редакция", "IP при принятии"];
   const st = {active:"активен", wait:"не входил", off:"отключён"};
   const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.name, s.phone, TARIFFS[s.tariff] || s.tariff, PRICES[s.tariff] || "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)]]);
+  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.name, s.phone, TARIFFS[s.tariff] || s.tariff, PRICES[s.tariff] || "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)], s.docs_ok ? "принято" : "не принято", docsAt(s), s.accepted_version || "", s.accepted_ip || ""]);
   const csv = "﻿" + [head, ...rows].map(r => r.map(cell).join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));

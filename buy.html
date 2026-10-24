@@ -143,6 +143,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line-strong)}
 .field input:focus{outline:none;border-color:var(--text);box-shadow:0 0 0 4px rgba(197,242,58,.4);background:#fff}
 .modal-box .btn{width:100%;margin-top:6px}
 .modal-box .fine{margin:14px 0 0;font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+.modal-box .fine a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 
 @media (max-width:900px){
   .hero-in{grid-template-columns:1fr;gap:36px;padding:32px 0 64px}
@@ -314,7 +315,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line-strong)}
   </div>
 </section>
 
-<footer><div class="wrap"><span>© <span id="year"></span> Бизнес на нейросетях</span><span>Есть вопросы? <a id="contact" href="#" target="_blank" rel="noopener">Напиши в Telegram</a></span></div></footer>
+<footer><div class="wrap"><span>© <span id="year"></span> Бизнес на нейросетях</span><span><a href="oferta.html" target="_blank">Договор-оферта</a> · <a href="privacy.html" target="_blank">Политика конфиденциальности</a></span><span>Есть вопросы? <a id="contact" href="#" target="_blank" rel="noopener">Напиши в Telegram</a></span></div></footer>
 
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="modal-box">
@@ -324,7 +325,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line-strong)}
     <div class="sum"><span>К оплате</span><b id="mPrice"></b></div>
     <div class="field"><label for="mName">Как к тебе обращаться? <span>· необязательно</span></label><input id="mName" autocomplete="given-name" maxlength="60" placeholder="Например, Артём"></div>
     <a class="btn btn-accent" id="mGo" href="#" target="_blank" rel="noopener">Написать в Telegram</a>
-    <p class="fine">Откроется чат с наставником. Сообщение уже написано, останется нажать «Отправить».</p>
+    <p class="fine">Откроется чат с наставником. Сообщение уже написано, останется нажать «Отправить». Покупая доступ, ты принимаешь условия <a href="oferta.html" target="_blank">Договора-оферты</a> и <a href="privacy.html" target="_blank">Политики конфиденциальности</a>.</p>
   </div>
 </div>
 
