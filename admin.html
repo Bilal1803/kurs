@@ -97,6 +97,7 @@ svg{flex-shrink:0}
 .pass-wrap button{position:absolute;right:6px;top:6px;width:34px;height:34px;border:0;background:none;color:var(--faint);border-radius:8px;display:grid;place-items:center}
 .pass-wrap button:hover{color:var(--text)}
 .err{display:flex;gap:8px;align-items:flex-start;color:var(--danger);font-size:13.5px;margin-top:12px}
+.hint{margin:0 0 16px;font-size:13px;line-height:1.5;color:var(--muted)}
 .err:empty{display:none}
 
 /* страница */
@@ -250,7 +251,7 @@ td.c-btns{width:1%}
     <div class="logo"><span class="logo-mark" data-icon="spark"></span>Бизнес на нейросетях<span class="tag">админ</span></div>
     <div class="login-card">
       <h1>Панель управления</h1>
-      <p>Продажи, ключи доступа и ученики.</p>
+      <p>Продажи, ключи доступа и участники.</p>
       <form id="loginForm">
         <div class="field">
           <label class="label" for="pass">Пароль администратора</label>
@@ -260,7 +261,7 @@ td.c-btns{width:1%}
         <div class="err" id="loginErr" role="alert"></div>
       </form>
     </div>
-    <div class="login-note">Доступ только для владельца курса</div>
+    <div class="login-note">Доступ только для владельца материалов</div>
   </div>
 </section>
 
@@ -290,19 +291,18 @@ td.c-btns{width:1%}
         <div class="card-b">
           <form id="saleForm">
             <div class="tariffs" role="radiogroup" aria-label="Тариф">
-              <label class="tariff"><input type="radio" name="tariff" value="start" checked><span class="radio"></span><span class="tariff-info"><b>Старт</b><span>Обучение без поиска клиентов</span></span><span class="price">2 990 ₽</span></label>
-              <label class="tariff"><input type="radio" name="tariff" value="earn"><span class="radio"></span><span class="tariff-info"><b>Заработок</b><span>Обучение и поиск клиентов</span></span><span class="price">5 990 ₽</span></label>
+              <label class="tariff"><input type="radio" name="tariff" value="start" checked><span class="radio"></span><span class="tariff-info"><b>Старт</b><span>Материалы без поиска клиентов</span></span><span class="price">2 990 ₽</span></label>
+              <label class="tariff"><input type="radio" name="tariff" value="earn"><span class="radio"></span><span class="tariff-info"><b>Заработок</b><span>Материалы и поиск клиентов</span></span><span class="price">5 990 ₽</span></label>
               <label class="tariff"><input type="radio" name="tariff" value="mentor"><span class="radio"></span><span class="tariff-info"><b>Наставник</b><span>Всё и личная поддержка</span></span><span class="price">11 990 ₽</span></label>
             </div>
-            <div class="field"><label class="label" for="name">Имя покупателя <span>· необязательно</span></label><input class="input" type="text" id="name" autocomplete="off" placeholder="Например, Артём" maxlength="100"></div>
-            <div class="field"><label class="label" for="phone">Телефон или Telegram <span>· необязательно</span></label><input class="input" type="text" id="phone" autocomplete="off" placeholder="+7 900 000-00-00" maxlength="30"></div>
+            <p class="hint">Имя и телефон не храним. Каждому покупателю автоматически присваивается ID участника: он видит его в кабинете, а ты находишь его по ID в списке.</p>
             <button class="btn btn-dark btn-block" id="saleBtn" type="submit"><span data-icon="key"></span>Создать ключ</button>
             <div class="err" id="saleErr" role="alert"></div>
           </form>
           <div class="result hidden" id="result" aria-live="polite">
             <div class="result-top"><i data-icon="check"></i><span>Ключ создан · тариф «<span id="resTariff"></span>»</span></div>
             <div class="key" id="resKey"></div>
-            <small>для <span id="resName"></span></small>
+            <small>ID участника <b id="resUid"></b></small>
             <div class="row">
               <button class="btn" id="copyKey" type="button"><span data-icon="copy"></span>Ключ</button>
               <button class="btn btn-accent" id="copyMsg" type="button"><span data-icon="send"></span>Сообщение</button>
@@ -314,12 +314,12 @@ td.c-btns{width:1%}
       <div class="card">
         <div class="card-h"><div><h2>Покупатели</h2><p id="listSub">Все выданные ключи</p></div><button class="btn btn-line btn-sm" id="csvBtn" type="button"><span data-icon="download"></span>CSV</button></div>
         <div class="toolbar">
-          <div class="search"><span data-icon="search"></span><input class="input" type="search" id="search" placeholder="Поиск по имени, телефону или ключу" aria-label="Поиск"></div>
+          <div class="search"><span data-icon="search"></span><input class="input" type="search" id="search" placeholder="Поиск по ID участника или ключу" aria-label="Поиск"></div>
           <div class="seg" id="seg" role="group" aria-label="Фильтр"></div>
         </div>
         <div class="tablewrap">
           <table>
-            <thead><tr><th>Покупатель</th><th>Тариф</th><th>Ключ</th><th>Активность</th><th></th></tr></thead>
+            <thead><tr><th>Участник</th><th>Тариф</th><th>Ключ</th><th>Активность</th><th></th></tr></thead>
             <tbody id="rows"></tbody>
           </table>
         </div>
@@ -346,6 +346,7 @@ let SALES = [], last = null, filter = "all";
 const P = {
   spark:'<path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" fill="currentColor" stroke="none"/>',
   check:'<polyline points="20 6 9 17 4 12"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M18.5 4.5l2 2"/>',
   copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
@@ -434,13 +435,12 @@ function ago(ts){
   if(s < 86400 * 30) return Math.floor(s / 86400) + " дн назад";
   return dateStr(ts);
 }
-const initials = n => (n || "").trim() ? n.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase() : "?";
 const AVA = ["#D8F86A","#9FD0FF","#FFB86B","#C9B8FF","#7EE0C3","#FF9FB2"];
 const avaColor = s => AVA[[...String(s)].reduce((a, c) => a + c.charCodeAt(0), 0) % AVA.length];
 const docsAt = s => s.accepted_at ? dateStr(s.accepted_at) + " " + timeStr(s.accepted_at) : "";
 const docBadge = s => s.docs_ok
   ? `<span class="badge b-doc ok" title="Договор-оферта и согласие на ПДн приняты ${docsAt(s)}, IP ${esc(s.accepted_ip || "?")}">Договор принят · ${dateStr(s.accepted_at)}</span>`
-  : `<span class="badge b-doc no" title="${s.accepted_at ? "Принята старая редакция " + esc(s.accepted_version || "") + ". Ученик примет новую при следующем входе" : "Ученик ещё не отметил галочки, уроки ему закрыты"}">${s.accepted_at ? "Нужна новая редакция" : "Договор не принят"}</span>`;
+  : `<span class="badge b-doc no" title="${s.accepted_at ? "Принята старая редакция " + esc(s.accepted_version || "") + ". Участник примет новую при следующем входе" : "Участник ещё не отметил галочки, уроки ему закрыты"}">${s.accepted_at ? "Нужна новая редакция" : "Договор не принят"}</span>`;
 const status = s => s.revoked ? "off" : s.last_seen ? "active" : "wait";
 const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? b : c); };
 
@@ -466,11 +466,11 @@ function render(){
   $("seg").innerHTML = Object.keys(names).map(k => `<button type="button" data-f="${k}" aria-pressed="${filter === k}">${names[k]}<em>${counts[k]}</em></button>`).join("");
 
   const q = $("search").value.trim().toLowerCase();
-  const list = SALES.filter(s => (filter === "all" || status(s) === filter) && (!q || [s.name, s.phone, s.key].some(v => String(v || "").toLowerCase().includes(q))));
+  const list = SALES.filter(s => (filter === "all" || status(s) === filter) && (!q || [s.uid, s.key, s.name, s.phone].some(v => String(v || "").toLowerCase().includes(q))));
   const badge = {active:'<span class="badge b-active">Активен</span>', wait:'<span class="badge b-wait">Не входил</span>', off:'<span class="badge b-off">Отключён</span>'};
   $("rows").innerHTML = list.length ? list.map(s => `
     <tr class="${s.revoked ? "off" : ""}">
-      <td class="c-who"><div class="who"><span class="ava" style="background:${avaColor(s.key)}">${esc(initials(s.name))}</span><div><b>${esc(s.name) || "Без имени"}</b><small>${esc(s.phone) || "контакт не указан"}</small></div></div></td>
+      <td class="c-who"><div class="who"><span class="ava" style="background:${avaColor(s.key)}">${icon("user", 16)}</span><div><b>ID ${esc(s.uid)}</b><small>${s.name || s.phone ? esc([s.name, s.phone].filter(Boolean).join(" · ")) : "куплен " + dateStr(s.created_at)}</small></div></div></td>
       <td class="c-tariff"><select class="tsel" data-tariff="${s.id}" aria-label="Тариф">${Object.entries(TARIFFS).map(([k,v]) => `<option value="${k}" ${k===s.tariff?"selected":""}>${v}</option>`).join("")}</select></td>
       <td class="c-key" data-l="Ключ"><span class="keycell"><code>${esc(s.key)}</code><button class="iconbtn" type="button" data-copykey="${s.id}" title="Скопировать ключ" aria-label="Скопировать ключ">${icon("copy",14)}</button></span></td>
       <td class="c-act"><div class="activity">${badge[status(s)]}<small title="${s.last_seen ? "Последний вход: " + dateStr(s.last_seen) + ", " + timeStr(s.last_seen) : ""}">${s.last_seen ? "вход " + ago(s.last_seen) : "создан " + dateStr(s.created_at)}</small>${docBadge(s)}</div></td>
@@ -484,22 +484,20 @@ $("search").addEventListener("input", render);
 $("seg").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if(b){ filter = b.dataset.f; render(); } });
 
 function message(s){
-  return `Привет${s.name ? ", " + s.name : ""}! Доступ к обучению «Бизнес на нейросетях» открыт.\n\nСайт: ${SITE}\nТвой ключ: ${s.key}\nТариф: ${TARIFFS[s.tariff]}\n\nЗайди на сайт, вставь ключ, прочитай и подтверди договор-оферту и начинай с урока 0.1.`;
+  return `Привет! Доступ к материалам «Бизнес на нейросетях» открыт.\n\nСайт: ${SITE}\nТвой ключ: ${s.key}\nТвой ID участника: ${s.uid}\nТариф: ${TARIFFS[s.tariff]}\n\nЗайди на сайт, вставь ключ, прочитай и подтверди договор-оферту и начинай с урока 0.1.`;
 }
 
 // ---------- новая продажа ----------
 $("saleForm").addEventListener("submit", async e => {
   e.preventDefault();
   const tariff = document.querySelector("input[name=tariff]:checked").value;
-  const name = $("name").value.trim(), phone = $("phone").value.trim();
   $("saleErr").textContent = "";
   const b = $("saleBtn"); b.disabled = true; b.innerHTML = '<span class="spinner"></span>Создаём…';
   try {
-    const {key} = await api("/api/admin/sales", {method:"POST", body: JSON.stringify({tariff, name, phone})});
-    last = {key, tariff, name};
-    $("resKey").textContent = key; $("resName").textContent = name || "покупателя"; $("resTariff").textContent = TARIFFS[tariff];
+    const {key, uid} = await api("/api/admin/sales", {method:"POST", body: JSON.stringify({tariff})});
+    last = {key, uid, tariff};
+    $("resKey").textContent = key; $("resUid").textContent = uid; $("resTariff").textContent = TARIFFS[tariff];
     $("result").classList.remove("hidden"); $("result").style.animation = "none"; void $("result").offsetWidth; $("result").style.animation = "";
-    $("name").value = ""; $("phone").value = "";
     await loadSales();
     toast("Ключ создан");
   } catch(err){ $("saleErr").innerHTML = errHtml(netMsg(err)); }
@@ -531,10 +529,10 @@ $("rows").addEventListener("change", async e => {
 
 // ---------- выгрузка ----------
 $("csvBtn").addEventListener("click", () => {
-  const head = ["Дата", "Имя", "Контакт", "Тариф", "Цена", "Ключ", "Последний вход", "Статус", "Договор и согласие ПДн", "Дата принятия", "Редакция", "IP при принятии"];
+  const head = ["Дата", "ID участника", "Тариф", "Цена", "Ключ", "Последний вход", "Статус", "Договор и согласие ПДн", "Дата принятия", "Редакция", "IP при принятии"];
   const st = {active:"активен", wait:"не входил", off:"отключён"};
   const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.name, s.phone, TARIFFS[s.tariff] || s.tariff, PRICES[s.tariff] || "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)], s.docs_ok ? "принято" : "не принято", docsAt(s), s.accepted_version || "", s.accepted_ip || ""]);
+  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.uid, TARIFFS[s.tariff] || s.tariff, PRICES[s.tariff] || "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)], s.docs_ok ? "принято" : "не принято", docsAt(s), s.accepted_version || "", s.accepted_ip || ""]);
   const csv = "﻿" + [head, ...rows].map(r => r.map(cell).join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
