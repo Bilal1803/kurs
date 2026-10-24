@@ -98,6 +98,12 @@ svg{flex-shrink:0}
 .pass-wrap button:hover{color:var(--text)}
 .err{display:flex;gap:8px;align-items:flex-start;color:var(--danger);font-size:13.5px;margin-top:12px}
 .hint{margin:0 0 16px;font-size:13px;line-height:1.5;color:var(--muted)}
+.free-check{display:flex;gap:10px;align-items:flex-start;margin:0 0 16px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;cursor:pointer;font-size:14px;line-height:1.45}
+.free-check:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.free-check input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.free-check small{display:block;color:var(--muted);font-size:12.5px}
+.b-free{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.iconbtn.on{color:var(--accent-text);background:var(--accent-soft)}
 .err:empty{display:none}
 
 /* страница */
@@ -295,6 +301,7 @@ td.c-btns{width:1%}
               <label class="tariff"><input type="radio" name="tariff" value="earn"><span class="radio"></span><span class="tariff-info"><b>Заработок</b><span>Материалы и поиск клиентов</span></span><span class="price">5 990 ₽</span></label>
               <label class="tariff"><input type="radio" name="tariff" value="mentor"><span class="radio"></span><span class="tariff-info"><b>Наставник</b><span>Всё и личная поддержка</span></span><span class="price">11 990 ₽</span></label>
             </div>
+            <label class="free-check"><input type="checkbox" id="free"><span><b>Бесплатный ключ</b><small>Подарок или доступ другу: не учитывается в выручке и продажах</small></span></label>
             <p class="hint">Имя и телефон не храним. Каждому покупателю автоматически присваивается ID участника: он видит его в кабинете, а ты находишь его по ID в списке.</p>
             <button class="btn btn-dark btn-block" id="saleBtn" type="submit"><span data-icon="key"></span>Создать ключ</button>
             <div class="err" id="saleErr" role="alert"></div>
@@ -335,6 +342,7 @@ const API = (window.CONFIG && CONFIG.API_URL || "").replace(/\/$/, "");
 const SITE = (window.CONFIG && CONFIG.SITE_URL) || "";
 const TARIFFS = {start:"Старт", earn:"Заработок", mentor:"Наставник"};
 const PRICES = {start:2990, earn:5990, mentor:11990};
+const price = s => s.free ? 0 : (PRICES[s.tariff] || 0);
 const COLORS = {start:"#9FD0FF", earn:"#C5F23A", mentor:"#FFB86B"};
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -346,6 +354,7 @@ let SALES = [], last = null, filter = "all";
 const P = {
   spark:'<path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" fill="currentColor" stroke="none"/>',
   check:'<polyline points="20 6 9 17 4 12"/>',
+  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
   user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M16 7l3 3M18.5 4.5l2 2"/>',
   copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
@@ -447,17 +456,18 @@ const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 
 // ---------- отрисовка ----------
 function render(){
   const active = SALES.filter(s => !s.revoked);
-  const sum = active.reduce((a, s) => a + (PRICES[s.tariff] || 0), 0);
+  const sum = active.reduce((a, s) => a + price(s), 0);
+  const paid = SALES.filter(s => !s.free), gifts = SALES.length - paid.length;
   const entered = active.filter(s => s.last_seen).length;
   const off = SALES.length - active.length;
   const weekAgo = Date.now() / 1000 - 7 * 86400;
-  const week = SALES.filter(s => s.created_at > weekAgo).length;
-  const byT = Object.keys(TARIFFS).map(k => ({k, n: active.filter(s => s.tariff === k).length, sum: active.filter(s => s.tariff === k).length * PRICES[k]}));
+  const week = paid.filter(s => s.created_at > weekAgo).length;
+  const byT = Object.keys(TARIFFS).map(k => ({k, n: active.filter(s => s.tariff === k && !s.free).length, sum: active.filter(s => s.tariff === k).reduce((a, s) => a + price(s), 0)}));
   const conv = active.length ? Math.round(entered / active.length * 100) : 0;
   $("kpis").innerHTML = `
     <div class="kpi main"><div class="kpi-top">Выручка<span class="kpi-ico">${icon("wallet")}</span></div><b>${money(sum)}</b><small>по ценам тарифов, без отключённых</small>
       ${sum ? `<div class="split">${byT.filter(t => t.sum).map(t => `<span style="width:${t.sum / sum * 100}%;background:${COLORS[t.k]}"></span>`).join("")}</div><div class="legend">${byT.map(t => `<span><i style="background:${COLORS[t.k]}"></i>${TARIFFS[t.k]} · ${t.n}</span>`).join("")}</div>` : ""}</div>
-    <div class="kpi"><div class="kpi-top">Продажи<span class="kpi-ico">${icon("users")}</span></div><b>${SALES.length}</b><small>${week ? `+${week} за 7 дней` : "за всё время"}</small></div>
+    <div class="kpi"><div class="kpi-top">Продажи<span class="kpi-ico">${icon("users")}</span></div><b>${paid.length}</b><small>${week ? `+${week} за 7 дней` : "за всё время"}${gifts ? ` · ${gifts} ${plural(gifts, "подарок", "подарка", "подарков")}` : ""}</small></div>
     <div class="kpi"><div class="kpi-top">Активировали<span class="kpi-ico">${icon("login")}</span></div><b>${entered}<span style="font-size:.55em;color:var(--faint);font-weight:600"> · ${conv}%</span></b><small>вошли на сайт хотя бы раз</small></div>
     <div class="kpi"><div class="kpi-top">Отключено<span class="kpi-ico">${icon("ban")}</span></div><b>${off}</b><small>ключей без доступа</small></div>`;
 
@@ -470,14 +480,14 @@ function render(){
   const badge = {active:'<span class="badge b-active">Активен</span>', wait:'<span class="badge b-wait">Не входил</span>', off:'<span class="badge b-off">Отключён</span>'};
   $("rows").innerHTML = list.length ? list.map(s => `
     <tr class="${s.revoked ? "off" : ""}">
-      <td class="c-who"><div class="who"><span class="ava" style="background:${avaColor(s.key)}">${icon("user", 16)}</span><div><b>ID ${esc(s.uid)}</b><small>${s.name || s.phone ? esc([s.name, s.phone].filter(Boolean).join(" · ")) : "куплен " + dateStr(s.created_at)}</small></div></div></td>
+      <td class="c-who"><div class="who"><span class="ava" style="background:${avaColor(s.key)}">${icon("user", 16)}</span><div><b>ID ${esc(s.uid)}</b><small>${s.name || s.phone ? esc([s.name, s.phone].filter(Boolean).join(" · ")) : (s.free ? "подарен " : "куплен ") + dateStr(s.created_at)}</small>${s.free ? ' <span class="badge b-free">Бесплатно</span>' : ""}</div></div></td>
       <td class="c-tariff"><select class="tsel" data-tariff="${s.id}" aria-label="Тариф">${Object.entries(TARIFFS).map(([k,v]) => `<option value="${k}" ${k===s.tariff?"selected":""}>${v}</option>`).join("")}</select></td>
       <td class="c-key" data-l="Ключ"><span class="keycell"><code>${esc(s.key)}</code><button class="iconbtn" type="button" data-copykey="${s.id}" title="Скопировать ключ" aria-label="Скопировать ключ">${icon("copy",14)}</button></span></td>
       <td class="c-act"><div class="activity">${badge[status(s)]}<small title="${s.last_seen ? "Последний вход: " + dateStr(s.last_seen) + ", " + timeStr(s.last_seen) : ""}">${s.last_seen ? "вход " + ago(s.last_seen) : "создан " + dateStr(s.created_at)}</small>${docBadge(s)}</div></td>
-      <td class="c-btns"><div class="actions"><button class="iconbtn" type="button" data-copy="${s.id}" title="Скопировать сообщение покупателю" aria-label="Скопировать сообщение покупателю">${icon("send",15)}</button><button class="iconbtn" type="button" data-toggle="${s.id}" title="${s.revoked ? "Включить ключ" : "Отключить ключ"}" aria-label="${s.revoked ? "Включить ключ" : "Отключить ключ"}">${icon(s.revoked ? "power" : "ban", 15)}</button></div></td>
+      <td class="c-btns"><div class="actions"><button class="iconbtn" type="button" data-copy="${s.id}" title="Скопировать сообщение покупателю" aria-label="Скопировать сообщение покупателю">${icon("send",15)}</button><button class="iconbtn${s.free ? " on" : ""}" type="button" data-free="${s.id}" title="${s.free ? "Сделать платным" : "Сделать бесплатным (не считать в выручке)"}" aria-label="${s.free ? "Сделать платным" : "Сделать бесплатным"}">${icon("gift",15)}</button><button class="iconbtn" type="button" data-toggle="${s.id}" title="${s.revoked ? "Включить ключ" : "Отключить ключ"}" aria-label="${s.revoked ? "Включить ключ" : "Отключить ключ"}">${icon(s.revoked ? "power" : "ban", 15)}</button></div></td>
     </tr>`).join("")
     : `<tr><td colspan="5"><div class="empty"><div class="empty-ico">${icon(SALES.length ? "search" : "inbox", 22)}</div><b>${SALES.length ? "Ничего не найдено" : "Продаж пока нет"}</b>${SALES.length ? "Попробуй изменить поиск или фильтр" : "Создай первый ключ в форме слева"}</div></td></tr>`;
-  $("foot").innerHTML = `<span>Показано ${list.length} из ${SALES.length}</span><span>Сумма в списке: <b style="color:var(--text)">${money(list.filter(s => !s.revoked).reduce((a, s) => a + (PRICES[s.tariff] || 0), 0))}</b></span>`;
+  $("foot").innerHTML = `<span>Показано ${list.length} из ${SALES.length}</span><span>Сумма в списке: <b style="color:var(--text)">${money(list.filter(s => !s.revoked).reduce((a, s) => a + price(s), 0))}</b></span>`;
   $("listSub").textContent = SALES.length ? `${SALES.length} ${plural(SALES.length, "ключ", "ключа", "ключей")} выдано` : "Все выданные ключи";
 }
 $("search").addEventListener("input", render);
@@ -490,13 +500,13 @@ function message(s){
 // ---------- новая продажа ----------
 $("saleForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const tariff = document.querySelector("input[name=tariff]:checked").value;
+  const tariff = document.querySelector("input[name=tariff]:checked").value, free = $("free").checked;
   $("saleErr").textContent = "";
   const b = $("saleBtn"); b.disabled = true; b.innerHTML = '<span class="spinner"></span>Создаём…';
   try {
-    const {key, uid} = await api("/api/admin/sales", {method:"POST", body: JSON.stringify({tariff})});
+    const {key, uid} = await api("/api/admin/sales", {method:"POST", body: JSON.stringify({tariff, free})});
     last = {key, uid, tariff};
-    $("resKey").textContent = key; $("resUid").textContent = uid; $("resTariff").textContent = TARIFFS[tariff];
+    $("resKey").textContent = key; $("resUid").textContent = uid; $("resTariff").textContent = TARIFFS[tariff] + (free ? ", бесплатно" : ""); $("free").checked = false;
     $("result").classList.remove("hidden"); $("result").style.animation = "none"; void $("result").offsetWidth; $("result").style.animation = "";
     await loadSales();
     toast("Ключ создан");
@@ -513,6 +523,13 @@ $("rows").addEventListener("click", async e => {
   if(k){ const s = find(k.dataset.copykey); if(s) copy(s.key, "Ключ скопирован"); return; }
   const c = e.target.closest("[data-copy]");
   if(c){ const s = find(c.dataset.copy); if(s) copy(message(s), "Сообщение скопировано"); return; }
+  const f = e.target.closest("[data-free]");
+  if(f){
+    const s = find(f.dataset.free); if(!s) return;
+    try { await api(`/api/admin/sales/${s.id}`, {method:"POST", body: JSON.stringify({free: !s.free})}); toast(s.free ? "Ключ снова платный" : "Ключ бесплатный, в выручке не учитывается"); await loadSales(); }
+    catch(err){ toast(netMsg(err), true); }
+    return;
+  }
   const t = e.target.closest("[data-toggle]");
   if(t){
     const s = find(t.dataset.toggle); if(!s) return;
@@ -529,10 +546,10 @@ $("rows").addEventListener("change", async e => {
 
 // ---------- выгрузка ----------
 $("csvBtn").addEventListener("click", () => {
-  const head = ["Дата", "ID участника", "Тариф", "Цена", "Ключ", "Последний вход", "Статус", "Договор и согласие ПДн", "Дата принятия", "Редакция", "IP при принятии"];
+  const head = ["Дата", "ID участника", "Тариф", "Цена", "Бесплатно", "Ключ", "Последний вход", "Статус", "Договор и согласие ПДн", "Дата принятия", "Редакция", "IP при принятии"];
   const st = {active:"активен", wait:"не входил", off:"отключён"};
   const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.uid, TARIFFS[s.tariff] || s.tariff, PRICES[s.tariff] || "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)], s.docs_ok ? "принято" : "не принято", docsAt(s), s.accepted_version || "", s.accepted_ip || ""]);
+  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.uid, TARIFFS[s.tariff] || s.tariff, price(s), s.free ? "да" : "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)], s.docs_ok ? "принято" : "не принято", docsAt(s), s.accepted_version || "", s.accepted_ip || ""]);
   const csv = "﻿" + [head, ...rows].map(r => r.map(cell).join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
