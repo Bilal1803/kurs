@@ -301,6 +301,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line-strong)}
       <details><summary>Что нужно, чтобы начать?</summary><p>Телефон или компьютер. Для уровня с Telegram-ботами и сайтами лучше компьютер. Доступ к нейросетям и подписки настроим вместе с наставником.</p></details>
       <details><summary>Сколько можно заработать?</summary><p>Ориентиры из материалов: сайт для бизнеса от 20 000 ₽, бот от 15 000 ₽, карточки для маркетплейсов от 400 ₽ за штуку. Доход зависит от того, сколько клиентов ты найдёшь, поэтому в тарифах «Заработок» и «Наставник» есть блок про поиск клиентов.</p></details>
       <details><summary>Как я получу доступ?</summary><p>После оплаты наставник пришлёт ключ вида AI-XXXX-XXXX-XXXX. Его нужно ввести на странице входа, и материалы откроются. Ключ остаётся тем же, даже если ты повысишь тариф.</p></details>
+      <details><summary>На скольких устройствах работает доступ?</summary><p>Ключ работает на одном устройстве: телефоне или компьютере. Перейти на другое можно в любой момент: нажми «Выйти» на старом. Если нужно смотреть материалы и с телефона, и с ноутбука одновременно, можно докупить второе устройство за <span class="dev-price">990</span> ₽.</p></details>
       <details><summary>Можно ли потом перейти на старший тариф?</summary><p>Да. Нажми «Повысить тариф» в личном кабинете: покажем доплату, и откроется чат с наставником. Платишь только разницу между тарифами.</p></details>
     </div>
   </div>
@@ -332,6 +333,7 @@ footer a{text-decoration:none;border-bottom:1px solid var(--line-strong)}
 <script>
 const CFG = window.CONFIG || {};
 const TARIFFS = CFG.TARIFFS || [];
+document.querySelectorAll(".dev-price").forEach(e => e.textContent = (CFG.EXTRA_DEVICE_PRICE || 990).toLocaleString("ru-RU"));
 const CONTACT = (CFG.CONTACT_URL || "https://t.me/styllec").replace(/\/$/, "");
 const $ = id => document.getElementById(id);
 const rub = n => n.toLocaleString("ru-RU") + " ₽";

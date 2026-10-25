@@ -4,6 +4,7 @@ window.CONFIG = {
   API_URL: LOCAL ? "http://127.0.0.1:8000" : "https://api.ai-bizness.site",   // адрес сервера (backend)
   SITE_URL: LOCAL ? location.origin + "/" : "https://api.ai-bizness.site/", // адрес этого сайта на GitHub Pages
   CONTACT_URL: "https://t.me/styllec",           // куда писать, чтобы повысить тариф
+  EXTRA_DEVICE_PRICE: 990,                        // цена одного дополнительного устройства
   // тарифы от младшего к старшему: из цен считается доплата при повышении
   TARIFFS: [
     {id: "start",  name: "Старт",     price: 2990,  desc: "Материалы без поиска клиентов"},

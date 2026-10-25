@@ -103,6 +103,10 @@ svg{flex-shrink:0}
 .free-check input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--accent);flex:none}
 .free-check small{display:block;color:var(--muted);font-size:12.5px}
 .b-free{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.devs{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap}
+.devs button{border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:7px;height:22px;min-width:22px;padding:0 6px;font:600 12px var(--font);cursor:pointer}
+.devs button:hover{border-color:var(--line-strong)}
+.devs.full b{color:var(--warn-text)}
 .iconbtn.on{color:var(--accent-text);background:var(--accent-soft)}
 .err:empty{display:none}
 
@@ -450,6 +454,16 @@ const docsAt = s => s.accepted_at ? dateStr(s.accepted_at) + " " + timeStr(s.acc
 const docBadge = s => s.docs_ok
   ? `<span class="badge b-doc ok" title="Договор-оферта и согласие на ПДн приняты ${docsAt(s)}, IP ${esc(s.accepted_ip || "?")}">Договор принят · ${dateStr(s.accepted_at)}</span>`
   : `<span class="badge b-doc no" title="${s.accepted_at ? "Принята старая редакция " + esc(s.accepted_version || "") + ". Участник примет новую при следующем входе" : "Участник ещё не отметил галочки, уроки ему закрыты"}">${s.accepted_at ? "Нужна новая редакция" : "Договор не принят"}</span>`;
+const uaName = ua => {
+  const os = /iPhone/.test(ua) ? "iPhone" : /iPad/.test(ua) ? "iPad" : /Android/.test(ua) ? "Android" : /Windows/.test(ua) ? "Windows" : /Mac OS/.test(ua) ? "Mac" : /Linux/.test(ua) ? "Linux" : "Устройство";
+  const br = /YaBrowser/.test(ua) ? "Яндекс" : /Edg\//.test(ua) ? "Edge" : /OPR\//.test(ua) ? "Opera" : /Firefox/.test(ua) ? "Firefox" : /Chrome/.test(ua) ? "Chrome" : /Safari/.test(ua) ? "Safari" : "";
+  return br ? os + " · " + br : os;
+};
+const devCell = s => {
+  const used = (s.device_list || []).length, lim = s.devices || 1;
+  const tip = (s.device_list || []).map(d => uaName(d.ua) + ", вход " + ago(d.last_seen || d.created_at)).join("\n") || "Ещё ни одного устройства";
+  return `<span class="devs${used >= lim ? " full" : ""}" title="${esc(tip)}">Устройства <b>${used}/${lim}</b><button type="button" data-devplus="${s.id}" title="Добавить устройство (докупили)">+</button>${lim > 1 ? `<button type="button" data-devminus="${s.id}" title="Убрать одно устройство">−</button>` : ""}${used ? `<button type="button" data-devreset="${s.id}" title="Отвязать все устройства: ученик сможет войти заново с любого">сброс</button>` : ""}</span>`;
+};
 const status = s => s.revoked ? "off" : s.last_seen ? "active" : "wait";
 const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? b : c); };
 
@@ -483,7 +497,7 @@ function render(){
       <td class="c-who"><div class="who"><span class="ava" style="background:${avaColor(s.key)}">${icon("user", 16)}</span><div><b>ID ${esc(s.uid)}</b><small>${s.name || s.phone ? esc([s.name, s.phone].filter(Boolean).join(" · ")) : (s.free ? "подарен " : "куплен ") + dateStr(s.created_at)}</small>${s.free ? ' <span class="badge b-free">Бесплатно</span>' : ""}</div></div></td>
       <td class="c-tariff"><select class="tsel" data-tariff="${s.id}" aria-label="Тариф">${Object.entries(TARIFFS).map(([k,v]) => `<option value="${k}" ${k===s.tariff?"selected":""}>${v}</option>`).join("")}</select></td>
       <td class="c-key" data-l="Ключ"><span class="keycell"><code>${esc(s.key)}</code><button class="iconbtn" type="button" data-copykey="${s.id}" title="Скопировать ключ" aria-label="Скопировать ключ">${icon("copy",14)}</button></span></td>
-      <td class="c-act"><div class="activity">${badge[status(s)]}<small title="${s.last_seen ? "Последний вход: " + dateStr(s.last_seen) + ", " + timeStr(s.last_seen) : ""}">${s.last_seen ? "вход " + ago(s.last_seen) : "создан " + dateStr(s.created_at)}</small>${docBadge(s)}</div></td>
+      <td class="c-act"><div class="activity">${badge[status(s)]}<small title="${s.last_seen ? "Последний вход: " + dateStr(s.last_seen) + ", " + timeStr(s.last_seen) : ""}">${s.last_seen ? "вход " + ago(s.last_seen) : "создан " + dateStr(s.created_at)}</small>${docBadge(s)}${devCell(s)}</div></td>
       <td class="c-btns"><div class="actions"><button class="iconbtn" type="button" data-copy="${s.id}" title="Скопировать сообщение покупателю" aria-label="Скопировать сообщение покупателю">${icon("send",15)}</button><button class="iconbtn${s.free ? " on" : ""}" type="button" data-free="${s.id}" title="${s.free ? "Сделать платным" : "Сделать бесплатным (не считать в выручке)"}" aria-label="${s.free ? "Сделать платным" : "Сделать бесплатным"}">${icon("gift",15)}</button><button class="iconbtn" type="button" data-toggle="${s.id}" title="${s.revoked ? "Включить ключ" : "Отключить ключ"}" aria-label="${s.revoked ? "Включить ключ" : "Отключить ключ"}">${icon(s.revoked ? "power" : "ban", 15)}</button></div></td>
     </tr>`).join("")
     : `<tr><td colspan="5"><div class="empty"><div class="empty-ico">${icon(SALES.length ? "search" : "inbox", 22)}</div><b>${SALES.length ? "Ничего не найдено" : "Продаж пока нет"}</b>${SALES.length ? "Попробуй изменить поиск или фильтр" : "Создай первый ключ в форме слева"}</div></td></tr>`;
@@ -523,6 +537,21 @@ $("rows").addEventListener("click", async e => {
   if(k){ const s = find(k.dataset.copykey); if(s) copy(s.key, "Ключ скопирован"); return; }
   const c = e.target.closest("[data-copy]");
   if(c){ const s = find(c.dataset.copy); if(s) copy(message(s), "Сообщение скопировано"); return; }
+  const dv = e.target.closest("[data-devplus],[data-devminus],[data-devreset]");
+  if(dv){
+    const s = find(dv.dataset.devplus || dv.dataset.devminus || dv.dataset.devreset); if(!s) return;
+    let payload, msg;
+    if(dv.dataset.devreset){
+      if(!confirm(`Отвязать все устройства у ID ${s.uid}?\nУченик войдёт заново с того устройства, где введёт ключ.`)) return;
+      payload = {reset_devices: true}; msg = "Устройства отвязаны";
+    } else {
+      const n = (s.devices || 1) + (dv.dataset.devplus ? 1 : -1);
+      payload = {devices: n}; msg = `Теперь устройств: ${n}`;
+    }
+    try { await api(`/api/admin/sales/${s.id}`, {method:"POST", body: JSON.stringify(payload)}); toast(msg); await loadSales(); }
+    catch(err){ toast(netMsg(err), true); }
+    return;
+  }
   const f = e.target.closest("[data-free]");
   if(f){
     const s = find(f.dataset.free); if(!s) return;
@@ -546,10 +575,10 @@ $("rows").addEventListener("change", async e => {
 
 // ---------- выгрузка ----------
 $("csvBtn").addEventListener("click", () => {
-  const head = ["Дата", "ID участника", "Тариф", "Цена", "Бесплатно", "Ключ", "Последний вход", "Статус", "Договор и согласие ПДн", "Дата принятия", "Редакция", "IP при принятии"];
+  const head = ["Дата", "ID участника", "Тариф", "Цена", "Бесплатно", "Устройств разрешено", "Устройств привязано", "Ключ", "Последний вход", "Статус", "Договор и согласие ПДн", "Дата принятия", "Редакция", "IP при принятии"];
   const st = {active:"активен", wait:"не входил", off:"отключён"};
   const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.uid, TARIFFS[s.tariff] || s.tariff, price(s), s.free ? "да" : "", s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)], s.docs_ok ? "принято" : "не принято", docsAt(s), s.accepted_version || "", s.accepted_ip || ""]);
+  const rows = SALES.map(s => [dateStr(s.created_at) + " " + timeStr(s.created_at), s.uid, TARIFFS[s.tariff] || s.tariff, price(s), s.free ? "да" : "", s.devices || 1, (s.device_list || []).length, s.key, s.last_seen ? dateStr(s.last_seen) + " " + timeStr(s.last_seen) : "", st[status(s)], s.docs_ok ? "принято" : "не принято", docsAt(s), s.accepted_version || "", s.accepted_ip || ""]);
   const csv = "﻿" + [head, ...rows].map(r => r.map(cell).join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));

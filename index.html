@@ -145,6 +145,12 @@ svg{flex-shrink:0}
 [data-theme="dark"] .check input{accent-color:var(--accent)}
 .check a{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--accent);text-decoration-thickness:2px}
 .accept-card .btn:disabled{opacity:.45;cursor:not-allowed}
+.device-limit{margin-top:16px;padding:18px;border-radius:16px;background:#FFF6E5;border:1px solid #F3DDAF;color:#5A4413;font-size:14.5px;line-height:1.55}
+[data-theme="dark"] .device-limit{background:rgba(255,184,77,.08);border-color:rgba(255,184,77,.25);color:var(--text)}
+.device-limit b{display:block;font-size:15.5px;margin-bottom:6px}
+.device-limit ul{margin:10px 0 14px;padding-left:20px}
+.device-limit li{margin-bottom:4px}
+.device-limit .btn{width:100%;margin-top:0}
 .accept-note{margin:14px 0 0;font-size:13px;color:#8A8B84;line-height:1.5}
 @media (max-width:960px){
   .gate-main{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:32px}
@@ -494,6 +500,15 @@ a.lcard:hover .lcard-go{background:var(--ink);color:#fff;border-color:var(--ink)
         <button class="btn btn-accent btn-lg" id="keyBtn" type="submit">Открыть материалы</button>
         <div class="gate-error" id="gateError" role="alert"></div>
       </form>
+      <div class="device-limit hidden" id="deviceLimit" role="alert">
+        <b>Ключ уже используется на другом устройстве</b>
+        <span id="deviceLimitText"></span>
+        <ul>
+          <li>Чтобы перейти на это устройство, нажми «Выйти» в кабинете на старом.</li>
+          <li>Старого устройства нет под рукой? Напиши наставнику, он сбросит привязку.</li>
+        </ul>
+        <a class="btn btn-accent btn-lg" id="deviceBuy" href="#" target="_blank" rel="noopener">Докупить устройство</a>
+      </div>
       <div class="login-help">Ещё нет доступа? <a href="buy.html">Выбрать тариф и купить</a>. Ключ не подходит? <a class="contact-link" href="#" target="_blank" rel="noopener">Напиши наставнику</a>.</div>
     </div>
   </div>
@@ -511,7 +526,7 @@ a.lcard:hover .lcard-go{background:var(--ink);color:#fff;border-color:var(--ink)
       <h2 id="acceptTitle">Подтверди условия доступа</h2>
       <p>Прочитай документы по ссылкам и отметь обе галочки. Это нужно один раз.</p>
       <ul class="accept-terms" id="acceptTerms">
-        <li>Ключ доступа личный: его нельзя передавать другим людям.</li>
+        <li>Ключ доступа личный: его нельзя передавать другим людям. Он работает на одном устройстве, дополнительные можно докупить.</li>
         <li>Материалы уроков нельзя копировать и распространять. Шаблоны, промпты и код можно использовать в работе для своих клиентов.</li>
         <li>Доход зависит от твоих действий: материалы дают знания и инструменты, но не гарантирует заработок.</li>
         <li>Возврат возможен по правилам раздела 9 договора.</li>
@@ -578,6 +593,11 @@ const store = {
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
   del(k){ try { localStorage.removeItem(k); } catch(e){} }
 };
+// постоянный идентификатор этого браузера: по нему сервер считает устройства
+const DEVICE = store.get("deviceId") || (() => {
+  const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)).replace(/-/g, "");
+  store.set("deviceId", id); return id;
+})();
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 // ---------- иконки ----------
@@ -627,9 +647,9 @@ const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 
 const readMin = html => Math.max(2, Math.round(String(html).replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length / 170));
 
 async function login(key){
-  const res = await fetch(API + "/api/access", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key})});
+  const res = await fetch(API + "/api/access", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key, device: DEVICE})});
   const data = await res.json().catch(() => ({}));
-  if(!res.ok){ const e = new Error(data.detail || "Не получилось войти. Попробуй ещё раз."); e.status = res.status; throw e; }
+  if(!res.ok){ const e = new Error(data.detail || "Не получилось войти. Попробуй ещё раз."); e.status = res.status; e.data = data; throw e; }
   return data;
 }
 
@@ -648,6 +668,14 @@ function start(data, key){
 }
 
 function showGate(){ $("boot").classList.add("hidden"); $("gate").classList.remove("hidden"); }
+function showDeviceLimit(d){
+  const price = (window.CONFIG && CONFIG.EXTRA_DEVICE_PRICE) || 0;
+  $("deviceLimitText").textContent = d.detail + " Можно докупить ещё одно устройство" + (price ? " за " + price.toLocaleString("ru-RU") + " ₽" : "") + ", тогда материалы откроются и здесь, и на старом.";
+  const msg = "Здравствуйте! Хочу докупить ещё одно устройство для доступа к материалам." + (d.uid ? "\nМой ID участника: " + d.uid : "") + "\nПодскажите, как оплатить.";
+  $("deviceBuy").href = CONTACT.replace(/\/$/, "") + "?text=" + encodeURIComponent(msg);
+  $("deviceBuy").innerHTML = "Докупить устройство" + (price ? " · " + price.toLocaleString("ru-RU") + " ₽" : "") + icon("right", 18);
+  $("deviceLimit").classList.remove("hidden");
+}
 
 // ---------- принятие договора-оферты и согласия на обработку ПДн ----------
 // без двух галочек сервер не отдаёт уроки, поэтому этот экран нельзя пропустить
@@ -678,7 +706,7 @@ function showAccept(data, key){
 }
 $("acceptBtn").innerHTML = "Принять и перейти к урокам" + icon("right", 18);
 $("acceptTerms").querySelectorAll("li").forEach(li => li.insertAdjacentHTML("afterbegin", icon("check", 16)));
-$("acceptExit").addEventListener("click", e => { e.preventDefault(); store.del("courseKey"); location.hash = ""; location.reload(); });
+$("acceptExit").addEventListener("click", e => { e.preventDefault(); signOut(store.get("courseKey")); });
 
 // ---------- форма входа ----------
 const keyInput = $("keyInput");
@@ -699,16 +727,20 @@ $("keyForm").addEventListener("submit", async e => {
   const err = msg => { $("gateError").innerHTML = icon("alert", 16) + "<span>" + esc(msg) + "</span>"; keyInput.setAttribute("aria-invalid", "true"); };
   if(!key){ err("Вставь ключ, который пришёл после оплаты."); keyInput.focus(); return; }
   const btn = $("keyBtn");
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Проверяем ключ…'; $("gateError").textContent = "";
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Проверяем ключ…'; $("gateError").textContent = ""; $("deviceLimit").classList.add("hidden");
   try { const data = await login(key); store.set("courseKey", key); enter(data, key); }
-  catch(ex){ err(ex.message === "Failed to fetch" ? "Нет связи с сервером. Проверь интернет и попробуй ещё раз." : ex.message); }
+  catch(ex){ if(ex.data && ex.data.device_limit) return showDeviceLimit(ex.data); err(ex.message === "Failed to fetch" ? "Нет связи с сервером. Проверь интернет и попробуй ещё раз." : ex.message); }
   finally { btn.disabled = false; btn.innerHTML = "Открыть материалы" + icon("right", 18); }
 });
 $("keyBtn").innerHTML = "Открыть материалы" + icon("right", 18);
 
-$("logoutBtn").addEventListener("click", () => {
-  if(!confirm("Выйти из личного кабинета? Чтобы войти снова, понадобится ключ.")) return;
+async function signOut(key){
+  try { await fetch(API + "/api/logout", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key, device: DEVICE})}); } catch(e){}
   store.del("courseKey"); location.hash = ""; location.reload();
+}
+$("logoutBtn").addEventListener("click", () => {
+  if(!confirm("Выйти из личного кабинета? Это устройство отвяжется от ключа, и ключ можно будет открыть на другом.")) return;
+  signOut(KEY);
 });
 
 // ---------- мобильное меню ----------
@@ -941,7 +973,7 @@ async function download(btn){
   const label = btn.textContent;
   btn.disabled = true; btn.textContent = "Загружаем…";
   try {
-    const res = await fetch(API + "/api/material", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key: KEY, material: btn.dataset.material})});
+    const res = await fetch(API + "/api/material", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key: KEY, device: DEVICE, material: btn.dataset.material})});
     if(!res.ok){ const data = await res.json().catch(() => ({})); throw new Error(data.detail || "Не удалось скачать файл"); }
     const name = (/filename\*?=(?:UTF-8'')?"?([^";]+)/i.exec(res.headers.get("Content-Disposition") || "") || [])[1] || btn.dataset.material;
     const a = document.createElement("a");
@@ -1011,6 +1043,7 @@ async function copyText(s){
   catch(e){
     if(e.status === 403) store.del("courseKey");
     showGate();
+    if(e.data && e.data.device_limit) showDeviceLimit(e.data);
     if(e.message === "Failed to fetch") $("gateError").innerHTML = icon("alert",16) + "<span>Нет связи с сервером. Проверь интернет и нажми «Открыть материалы».</span>";
   }
 })();
